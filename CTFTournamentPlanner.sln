@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34031.279
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CTFTournamentPlanner", "CTFTournamentPlanner\CTFTournamentPlanner.csproj", "{104C78EE-2330-44AC-B0C7-75DBDA005F25}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{104C78EE-2330-44AC-B0C7-75DBDA005F25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{104C78EE-2330-44AC-B0C7-75DBDA005F25}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{104C78EE-2330-44AC-B0C7-75DBDA005F25}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{104C78EE-2330-44AC-B0C7-75DBDA005F25}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {322F3DE0-E76C-418D-9A33-65D2CA4A4A9C}
+	EndGlobalSection
+EndGlobal

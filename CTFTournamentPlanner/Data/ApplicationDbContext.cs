@@ -19,6 +19,11 @@ namespace CTFTournamentPlanner.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            /*
+            CTFTournamentPlannerUser bruce = new() { UserName = "Bruce", Email = "bruce@example.com" };
+            CTFTournamentPlannerUser thechosenone = new() { UserName = "TheChosenOne", Email = "thechosenone@example.com" };
+            */
+
             modelBuilder.Entity<Team>()
                 .HasOne(e => e.TeamLeader)
                 .WithMany()

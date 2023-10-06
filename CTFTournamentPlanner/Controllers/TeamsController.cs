@@ -15,9 +15,9 @@ namespace CTFTournamentPlanner.Controllers
     public class TeamsController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly UserManager<IdentityUser> userManager;
+        private readonly UserManager<CTFTournamentPlannerUser> userManager;
 
-        public TeamsController(ApplicationDbContext context, UserManager<IdentityUser> userManager)
+        public TeamsController(ApplicationDbContext context, UserManager<CTFTournamentPlannerUser> userManager)
         {
             _context = context;
             this.userManager = userManager;
@@ -64,19 +64,18 @@ namespace CTFTournamentPlanner.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name")] Team team)
         {
-            IdentityUser currentUser = await userManager.GetUserAsync(User);
+            CTFTournamentPlannerUser currentUser = await userManager.GetUserAsync(User);
             string currentUserId = await userManager.GetUserIdAsync(currentUser);
             string currentUsername = currentUser.ToString();
-            // string currentUserTeamId = currentUser.TeamId;
-
-
-            // Huidige gebruiker toevoegen aan het team. (ICollection<IdentityUser>)
-            team.Players.Add(currentUser);
-            team.TeamLeader = currentUser;
-            team.TeamLeaderId = currentUserId;
 
             if (ModelState.IsValid)
             {
+                // Huidige gebruiker toevoegen aan het team. (ICollection<CTFTournamentPlannerUser>)
+                currentUser.UserTeamId = team.Id;
+                team.Players.Add(currentUser);
+                team.TeamLeader = currentUser;
+                team.TeamLeaderId = currentUserId;
+
                 _context.Add(team);
                 await _context.SaveChangesAsync();
 

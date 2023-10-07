@@ -15,9 +15,9 @@ namespace CTFTournamentPlanner.Controllers
     public class TeamsController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly UserManager<CTFTournamentPlannerUser> userManager;
+        private readonly UserManager<Player> userManager;
 
-        public TeamsController(ApplicationDbContext context, UserManager<CTFTournamentPlannerUser> userManager)
+        public TeamsController(ApplicationDbContext context, UserManager<Player> userManager)
         {
             _context = context;
             this.userManager = userManager;
@@ -64,11 +64,11 @@ namespace CTFTournamentPlanner.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name")] Team team)
         {
-            CTFTournamentPlannerUser currentUser = await userManager.GetUserAsync(User);
+            Player currentUser = await userManager.GetUserAsync(User);
             string currentUserId = await userManager.GetUserIdAsync(currentUser);
             
 
-            if (currentUser.UserTeamId != null)
+            if (currentUser.PlayerTeamId != null)
             {
                 // Als een gebruiker al lid is van een team, mag deze geen nieuw team aanmaken.
                 ModelState.AddModelError(string.Empty, "You must first leave your current team before creating a new one.");
@@ -92,9 +92,19 @@ namespace CTFTournamentPlanner.Controllers
                 
                 _context.Add(team);
                 
-                // vanaf hier wordt de team Id pas definitief. Daarna kan de waarde van team.Id pas toegekend worden aan UserTeamId.
+                // Vanaf hier wordt team.Id pas definitief. Daarna kan de waarde van team.Id pas toegekend worden aan PlayerTeamId.
                 await _context.SaveChangesAsync();
-                currentUser.UserTeamId = team.Id;
+                currentUser.PlayerTeamId = team.Id;
+                currentUser.Team = team;
+
+                string currentUserTeam = currentUser.Team.Name;
+                Console.WriteLine(currentUserTeam);
+
+                // Even controleren of het mogelijk is om alle spelernamen uit een team op te halen.
+                foreach (Player p in team.Players)
+                {
+                    Console.WriteLine(p.UserName);
+                }
 
                 // Vandaar dat hier een tweede SaveChangesAsync() uitgevoerd moet worden; om currentUser.UserTeamId op te slaan!
                 await _context.SaveChangesAsync();
@@ -181,7 +191,7 @@ namespace CTFTournamentPlanner.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            CTFTournamentPlannerUser currentUser = await userManager.GetUserAsync(User);
+            Player currentUser = await userManager.GetUserAsync(User);
            
             if (_context.Teams == null)
             {
@@ -199,9 +209,9 @@ namespace CTFTournamentPlanner.Controllers
             {
                 _context.Teams.Remove(team);
 
-                foreach (CTFTournamentPlannerUser Player in team.Players)
+                foreach (Player Player in team.Players)
                 {
-                    Player.UserTeamId = null;
+                    Player.PlayerTeamId = null;
                 }
             }
 

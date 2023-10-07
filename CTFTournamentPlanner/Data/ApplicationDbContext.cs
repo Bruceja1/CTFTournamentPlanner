@@ -4,7 +4,7 @@ using CTFTournamentPlanner.Models;
 
 namespace CTFTournamentPlanner.Data
 {
-    public class ApplicationDbContext : IdentityDbContext<CTFTournamentPlannerUser>
+    public class ApplicationDbContext : IdentityDbContext<Player>
     {
         public DbSet<Team> Teams { get; set; }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)

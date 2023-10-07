@@ -4,6 +4,7 @@ using CTFTournamentPlanner.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CTFTournamentPlanner.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231006113658_TryingToFixUserManagerError")]
+    partial class TryingToFixUserManagerError
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -67,7 +70,7 @@ namespace CTFTournamentPlanner.Data.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("TeamId")
+                    b.Property<int>("TeamId")
                         .HasColumnType("int");
 
                     b.Property<bool>("TwoFactorEnabled")
@@ -76,9 +79,6 @@ namespace CTFTournamentPlanner.Data.Migrations
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
-
-                    b.Property<int?>("UserTeamId")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -258,7 +258,9 @@ namespace CTFTournamentPlanner.Data.Migrations
                 {
                     b.HasOne("CTFTournamentPlanner.Models.Team", null)
                         .WithMany("Players")
-                        .HasForeignKey("TeamId");
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("CTFTournamentPlanner.Models.Team", b =>

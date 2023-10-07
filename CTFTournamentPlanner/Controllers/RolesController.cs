@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity; // RoleManager, UserManager
+﻿using CTFTournamentPlanner.Models;
+using Microsoft.AspNetCore.Identity; // RoleManager, UserManager
 using Microsoft.AspNetCore.Mvc; // Controller, IActionResult
 using static System.Console;
 
@@ -8,8 +9,8 @@ public class RolesController : Controller
     private string AdminRole = "Administrators";
     private string UserEmail = "test@example.com";
     private readonly RoleManager<IdentityRole> roleManager;
-    private readonly UserManager<IdentityUser> userManager;
-    public RolesController(RoleManager<IdentityRole> roleManager, UserManager<IdentityUser> userManager)
+    private readonly UserManager<CTFTournamentPlannerUser> userManager;
+    public RolesController(RoleManager<IdentityRole> roleManager, UserManager<CTFTournamentPlannerUser> userManager)
     {
         this.roleManager = roleManager;
         this.userManager = userManager;
@@ -20,7 +21,7 @@ public class RolesController : Controller
         {
             await roleManager.CreateAsync(new IdentityRole(AdminRole));
         }
-        IdentityUser user = await userManager.FindByEmailAsync(UserEmail);
+        CTFTournamentPlannerUser user = await userManager.FindByEmailAsync(UserEmail);
         if (user == null)
         {
             user = new();

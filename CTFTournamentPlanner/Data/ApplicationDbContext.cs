@@ -4,7 +4,7 @@ using CTFTournamentPlanner.Models;
 
 namespace CTFTournamentPlanner.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext<CTFTournamentPlannerUser>
     {
         public DbSet<Team> Teams { get; set; }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
@@ -18,6 +18,11 @@ namespace CTFTournamentPlanner.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            /*
+            CTFTournamentPlannerUser bruce = new() { UserName = "Bruce", Email = "bruce@example.com" };
+            CTFTournamentPlannerUser thechosenone = new() { UserName = "TheChosenOne", Email = "thechosenone@example.com" };
+            */
 
             modelBuilder.Entity<Team>()
                 .HasOne(e => e.TeamLeader)

@@ -1,0 +1,23 @@
+﻿@model IEnumerable<Player>
+@{
+    ViewData["Title"] = "Registered Players";
+}
+
+<h1>Registered Players</h1>
+<table>
+    <tr><th>ID</th><th>Name</th><th>Email</th><th>Team</th></tr>
+    @foreach (Player p in Model)
+    {
+        <tr>
+            <td>@p.Id</td>
+            <td>@p.UserName</td>
+            <td>@p.Email</td>
+            <td>@p.PlayerTeamName</td>
+            <td>
+                <a class="btn btn-sm btn-primary" asp-action="Edit" asp-route-id="@p.Id">
+                    Update
+                </a>
+            </td>
+        </tr>
+    }
+</table>

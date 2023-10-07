@@ -95,6 +95,7 @@ namespace CTFTournamentPlanner.Controllers
                 // Vanaf hier wordt team.Id pas definitief. Daarna kan de waarde van team.Id pas toegekend worden aan PlayerTeamId.
                 await _context.SaveChangesAsync();
                 currentUser.PlayerTeamId = team.Id;
+                currentUser.PlayerTeamName = team.Name;
                 currentUser.Team = team;
 
                 string currentUserTeam = currentUser.Team.Name;

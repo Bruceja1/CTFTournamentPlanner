@@ -99,7 +99,7 @@ namespace CTFTournamentPlanner.Controllers
                 var existingTeam = await _context.Teams.FirstOrDefaultAsync(t => t.Name == team.Name);
                 if (existingTeam != null)
                 {                  
-                    ModelState.AddModelError(string.Empty, "A team with this name already exists.");                    
+                    ModelState.AddModelError(string.Empty, "Dit team bestaat al.");                    
                 }
 
                 // Huidige gebruiker toevoegen aan het team.

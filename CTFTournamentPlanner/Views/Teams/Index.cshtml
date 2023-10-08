@@ -1,4 +1,5 @@
-﻿@model IEnumerable<CTFTournamentPlanner.Models.Team>
+﻿@* @model IEnumerable<CTFTournamentPlanner.Models.Team> *@
+@model TeamIndexViewModel
 
 @{
     ViewData["Title"] = "Index";
@@ -9,22 +10,32 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+@Html.ValidationSummary(true, "", new { @class = "text-danger"})
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                @Html.DisplayNameFor(model => model.Teams)
             </th>
-            <th></th>
+            <th>
+                @Html.DisplayNameFor(model => model.Players)
+            </th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var item in Model.Teams)
         {
             <tr>
                 <td>
                     @Html.DisplayFor(modelItem => item.Name)
                 </td>
+                <td>
+                    @foreach (var Player in item.Players)
+                    {
+                        <li>@Player.UserName</li>
+                    }
+                </td>
+
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                     <a asp-action="Details" asp-route-id="@item.Id">Details</a> |

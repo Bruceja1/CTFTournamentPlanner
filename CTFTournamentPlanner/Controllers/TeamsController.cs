@@ -26,9 +26,18 @@ namespace CTFTournamentPlanner.Controllers
         // GET: Teams      
         public async Task<IActionResult> Index()
         {
-            return _context.Teams != null ?
-                        View(await _context.Teams.ToListAsync()) :
-                        Problem("Entity set 'ApplicationDbContext.Teams'  is null.");
+            var viewModel = new TeamIndexViewModel
+            {
+                Teams = _context.Teams.Include(t => t.Players).ToList(),
+                Players = _context.Users.ToList()
+            };
+
+            if (_context.Teams == null)
+            {
+                return Problem("Entity set 'ApplicationDbContext.Teams'  is null.");
+            }
+
+            return View(viewModel);           
         }
 
         // GET: Teams/Details/5
@@ -52,8 +61,17 @@ namespace CTFTournamentPlanner.Controllers
 
         // GET: Teams/Create
         [Authorize]
-        public IActionResult Create()
+        public async Task <IActionResult> Create()
         {
+            Player currentUser = await userManager.GetUserAsync(User);
+            string currentUserId = await userManager.GetUserIdAsync(currentUser);
+
+
+            bool userHasTeam = _context.Users.Any(p => p.Id == currentUserId && p.TeamId != null);
+            if (userHasTeam)
+            {
+                ModelState.AddModelError(string.Empty, "Om een nieuw team aan te maken moet je eerst je huidige team verlaten.");
+            }
             return View();
         }
 
@@ -67,12 +85,13 @@ namespace CTFTournamentPlanner.Controllers
             Player currentUser = await userManager.GetUserAsync(User);
             string currentUserId = await userManager.GetUserIdAsync(currentUser);
             
-
-            if (currentUser.PlayerTeamId != null)
+            
+            bool userHasTeam = _context.Users.Any(p => p.Id == currentUserId && p.TeamId != null);
+            if (userHasTeam)
             {
-                // Als een gebruiker al lid is van een team, mag deze geen nieuw team aanmaken.
-                ModelState.AddModelError(string.Empty, "You must first leave your current team before creating a new one.");
+                ModelState.AddModelError(string.Empty, "Om een nieuw team aan te maken moet je eerst je huidige team verlaten.");
             }
+            
             
             if (ModelState.IsValid)
             {
@@ -83,31 +102,11 @@ namespace CTFTournamentPlanner.Controllers
                     ModelState.AddModelError(string.Empty, "A team with this name already exists.");                    
                 }
 
-                
-                // Huidige gebruiker toevoegen aan het team. (ICollection<CTFTournamentPlannerUser>)               
-                team.Players.Add(currentUser);
-                
-                team.TeamLeader = currentUser;
-                team.TeamLeaderId = currentUserId;
-                
-                _context.Add(team);
-                
-                // Vanaf hier wordt team.Id pas definitief. Daarna kan de waarde van team.Id pas toegekend worden aan PlayerTeamId.
-                await _context.SaveChangesAsync();
-                currentUser.PlayerTeamId = team.Id;
-                currentUser.PlayerTeamName = team.Name;
+                // Huidige gebruiker toevoegen aan het team.
                 currentUser.Team = team;
-
-                string currentUserTeam = currentUser.Team.Name;
-                Console.WriteLine(currentUserTeam);
-
-                // Even controleren of het mogelijk is om alle spelernamen uit een team op te halen.
-                foreach (Player p in team.Players)
-                {
-                    Console.WriteLine(p.UserName);
-                }
-
-                // Vandaar dat hier een tweede SaveChangesAsync() uitgevoerd moet worden; om currentUser.UserTeamId op te slaan!
+                currentUser.IsTeamLeader = true;
+                               
+                _context.Add(team);                             
                 await _context.SaveChangesAsync();
 
                 return RedirectToAction(nameof(Index));
@@ -170,6 +169,7 @@ namespace CTFTournamentPlanner.Controllers
 
 
         // GET: Teams/Delete/5
+        [Authorize]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.Teams == null)
@@ -184,39 +184,47 @@ namespace CTFTournamentPlanner.Controllers
                 return NotFound();
             }
 
+            Player currentUser = await userManager.GetUserAsync(User);
+            if (currentUser.IsTeamLeader == false | currentUser.Team != team)
+            {
+                ModelState.AddModelError("", "Je mag alleen je eigen team verwijderen.");
+                return View("Delete", team);
+            }
+
             return View(team);
         }
 
         // POST: Teams/Delete/5
+        [Authorize]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            Player currentUser = await userManager.GetUserAsync(User);
-           
+            Player currentUser = await userManager.GetUserAsync(User);               
             if (_context.Teams == null)
             {
                 return Problem("Entity set 'ApplicationDbContext.Teams'  is null.");
             }
 
             Team team = await _context.Teams.FindAsync(id);
-            if (currentUser.Id != team.TeamLeaderId)
-            {
-                /* ModelState.AddModelError(string.Empty, "You may only remove a team that you own."); */
-                ModelState.AddModelError(string.Empty, "You may only remove a team that you own.");
+            if (currentUser.IsTeamLeader == false | currentUser.Team != team)
+            {              
+                ModelState.AddModelError("", "Je mag alleen je eigen team verwijderen.");
+                return View("Delete", team);
             }
 
-            if (team != null)
+            if (team == null)
+            {
+                ModelState.AddModelError("", "Team not found");
+                return RedirectToAction(nameof(Index));
+            }
+
+            else
             {
                 _context.Teams.Remove(team);
-
-                foreach (Player Player in team.Players)
-                {
-                    Player.PlayerTeamId = null;
-                }
+                await _context.SaveChangesAsync();
             }
-
-            await _context.SaveChangesAsync();
+                                 
             return RedirectToAction(nameof(Index));
         }
 

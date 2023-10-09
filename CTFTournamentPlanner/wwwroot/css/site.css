@@ -19,4 +19,16 @@ html {
 
 body {
   margin-bottom: 60px;
+  font-family: minecraftia;
+  background-color: antiquewhite
+  
+  
+}
+
+@font-face {
+    font-family: 'minecraftia';
+    src: url('/font/Minecraftia-Regular.ttf');
+
+    font-weight: normal;
+    font-style: normal;
 }

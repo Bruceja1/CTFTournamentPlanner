@@ -9,8 +9,8 @@ public class RolesController : Controller
     private string AdminRole = "Administrators";
     private string UserEmail = "test@example.com";
     private readonly RoleManager<IdentityRole> roleManager;
-    private readonly UserManager<CTFTournamentPlannerUser> userManager;
-    public RolesController(RoleManager<IdentityRole> roleManager, UserManager<CTFTournamentPlannerUser> userManager)
+    private readonly UserManager<Player> userManager;
+    public RolesController(RoleManager<IdentityRole> roleManager, UserManager<Player> userManager)
     {
         this.roleManager = roleManager;
         this.userManager = userManager;
@@ -21,7 +21,7 @@ public class RolesController : Controller
         {
             await roleManager.CreateAsync(new IdentityRole(AdminRole));
         }
-        CTFTournamentPlannerUser user = await userManager.FindByEmailAsync(UserEmail);
+        Player user = await userManager.FindByEmailAsync(UserEmail);
         if (user == null)
         {
             user = new();

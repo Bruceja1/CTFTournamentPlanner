@@ -1,0 +1,36 @@
+﻿@model Player
+@{
+    ViewData["Title"] = "Modify Player Information";
+}
+
+<h1>Modify Player Information</h1>
+<a asp-action="Index">Back</a>
+<div asp-validation-summary="All" class="text-danger"></div>
+
+<form asp-action="Edit" method="post">
+
+    <table>
+        <tr>
+            <div class="form-group">
+                <label asp-for="Id"></label>
+                <input asp-for="Id" class="form-control" disabled />
+            </div>
+        </tr>
+
+        <tr>  
+            <div class="form-group">
+                <label asp-for="Email"></label>
+                <input asp-for="Email" class="form-control" />
+            </div>
+        </tr>
+
+        <tr>
+            <div class="form-group">
+                <label asp-for="UserName"></label>
+                <input asp-for="UserName" class="form-control" />
+            </div>
+        </tr>
+       
+        <button type="submit">Save</button>
+    </table>
+</form>

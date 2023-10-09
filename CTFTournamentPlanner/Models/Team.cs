@@ -6,13 +6,6 @@ namespace CTFTournamentPlanner.Models
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public ICollection<CTFTournamentPlannerUser> Players { get; set; } = new List<CTFTournamentPlannerUser>();
-        public CTFTournamentPlannerUser? TeamLeader { get; set; }
-        public string? TeamLeaderId { get; set; }
-
-        public Team()
-        {
-            Players = new List<CTFTournamentPlannerUser>();
-        }
+        public ICollection<Player>? Players { get; set; }
     }
 }

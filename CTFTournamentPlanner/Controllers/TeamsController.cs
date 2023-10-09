@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CTFTournamentPlanner.Data;
+using CTFTournamentPlanner.Data.Migrations;
 using CTFTournamentPlanner.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;

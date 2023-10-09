@@ -1,24 +1,34 @@
-﻿using CTFTournamentPlanner.Models;
+﻿using CTFTournamentPlanner.Data;
+using CTFTournamentPlanner.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Runtime.Intrinsics.X86;
 
 namespace CTFTournamentPlanner.Controllers
 {
     public class AdminController : Controller
     {
-        private UserManager<Player> userManager;
+        private readonly ApplicationDbContext _context;
+        private readonly UserManager<Player> userManager;
         private IPasswordHasher<Player> passwordHasher;
-        public AdminController(UserManager<Player> userManager)
+        public AdminController(ApplicationDbContext context, UserManager<Player> userManager)
         {
+            _context = context;
             this.userManager = userManager;
         }
 
         [Authorize(Roles = "Administrators")]
         public IActionResult Index()
         {
-            return View(userManager.Users);
+            var viewModel = new TeamIndexViewModel
+            {
+                Teams = _context.Teams.Include(t => t.Players).ToList(),
+                Players = _context.Users.Include(p => p.Team).ToList()
+            };
+            // return View(userManager.Users);
+            return View(viewModel);
         }
 
         [Authorize(Roles = "Administrators")]
@@ -80,6 +90,63 @@ namespace CTFTournamentPlanner.Controllers
         {
             foreach (IdentityError error in result.Errors)
                 ModelState.AddModelError("", error.Description);
+        }
+
+        [Authorize (Roles = "Administrators")]
+        public async Task<IActionResult> Delete(string id)
+        {
+            if (id == null || userManager.Users == null)
+            {
+                return NotFound();
+            }
+
+            Player player = await userManager.FindByIdAsync(id);
+            if (player == null)
+            {
+                return NotFound();
+            }
+
+            return View("Delete", player);
+        }
+
+        [Authorize (Roles = "Administrators")]
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(string id)
+        {
+            Player player = await userManager.FindByIdAsync(id);
+            if (userManager.Users == null)
+            {
+                return Problem("Entity set 'ApplicationDbContext.Teams'  is null.");
+            }
+
+            if (player != null)
+            {
+
+                // Als de gebruiker in een team zit, en hij het enig teamlid is of een teamleider is,
+                // wordt zijn team ook verwijderd.
+                Team? playerTeam = await _context.Teams.FindAsync(player.TeamId);
+                Console.WriteLine(playerTeam);
+
+                // Requirement om het teamleiderschap aan een ander teamlid te geven
+                // kan hier geïmplementeerd worden.
+                // List<Player> TeamMembers = userManager.Users.Where(p => p.TeamId == playerTeam.Id).ToList();
+                // ...
+                if (playerTeam != null && player.IsTeamLeader == true)
+                {
+                    _context.Teams.Remove(playerTeam);
+                    await _context.SaveChangesAsync();
+                }
+
+                IdentityResult result = await userManager.DeleteAsync(player);
+                if (result.Succeeded)
+                                                                     
+                    return RedirectToAction(nameof(Index));
+                
+                else
+                    Errors(result);               
+            }
+            return View("Index", userManager.Users);
         }
     }
 }

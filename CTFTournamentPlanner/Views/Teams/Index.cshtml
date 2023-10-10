@@ -5,10 +5,10 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>Teamlijst</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a class="btn btn-sm btn-primary" asp-action="Create">Nieuw Team Aanmaken</a>
 </p>
 @Html.ValidationSummary(true, "", new { @class = "text-danger"})
 <table class="table">
@@ -18,7 +18,10 @@
                 @Html.DisplayNameFor(model => model.Teams)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Players)
+                Teamleider
+            </th>
+            <th>
+                Aantal Teamleden
             </th>
         </tr>
     </thead>
@@ -30,10 +33,21 @@
                     @Html.DisplayFor(modelItem => item.Name)
                 </td>
                 <td>
-                    @foreach (var Player in item.Players)
+                    @foreach (Player player in item.Players)
                     {
-                        <li>@Player.UserName</li>
+                        if (player.IsTeamLeader)
+                        {
+                            <p>@player.UserName</p>
+                        }
                     }
+                </td>
+                <td>
+                    @{int memberCount = 0;}
+                    @foreach (Player player in item.Players)
+                    {
+                        memberCount += 1;
+                    }
+                    <p>@memberCount</p>                   
                 </td>
 
                 <td>

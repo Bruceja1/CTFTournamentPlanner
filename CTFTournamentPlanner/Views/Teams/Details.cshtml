@@ -4,21 +4,109 @@
     ViewData["Title"] = "Details";
 }
 
-<h1>Details</h1>
+<h1>@Html.DisplayFor(model => model.Name)</h1>
+<h3 class="mt-5">Beschrijving</h3>
+<p>@Html.DisplayFor(model => model.Description)</p>
+<a class="btn btn-sm btn-primary" asp-controller="Teams" asp-action="JoinTeam" asp-route-id="@Model.Id">Join Team</a>
 
-<div>
-    <h4>Team</h4>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Teamleider
+            </th>
+            <th>
+                Teamleden
+            </th>
+            <th>
+                Aantal teamleden
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                @foreach (Player player in Model.Players)
+                {
+                    @if (player.IsTeamLeader)
+                    {
+                        <p>@player.UserName</p>
+                    }
+                }
+            </td>
+                
+            <td>
+                <ul>
+                @{
+                    int count = 0;
+                }
+                @foreach (var player in Model.Players)
+                {
+                    if (count < 4)
+                    {
+                        <li>@player.UserName </li>
+
+                    }
+                    count++;
+                }
+                </ul>
+            </td>
+
+            <td>
+                @{
+                    int memberCount = 0;
+                }
+                @foreach (Player player in Model.Players)
+                {
+                    memberCount += 1;
+                }
+                <p>@memberCount</p>
+            </td>
+        </tr>
+</table>
+
+@*
+    </tbody>
     <hr />
     <dl class="row">
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
+            Team Leader
         </dt>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Players)
+        </dt>
+       
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Name)
+            
+            @foreach(Player player in Model.Players)
+            {
+                @if (player.IsTeamLeader)
+                {
+                    <p>@player.UserName</p>
+                }
+            }
+            
         </dd>
+
+        <dd class="col-sm-10">
+            
+                @{ int count = 0; }
+                @foreach (var player in Model.Players)
+                {
+                    if (count < 4)
+                    {
+                        <p>@player.UserName </p>
+                        
+                    }
+                    count++;
+                }
+            
+        </dd>       
     </dl>
-</div>
+
 <div>
     <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>
+*@

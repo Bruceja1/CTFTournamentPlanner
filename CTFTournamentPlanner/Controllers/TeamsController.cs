@@ -50,7 +50,8 @@ namespace CTFTournamentPlanner.Controllers
             }
 
             var team = await _context.Teams
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .Include(t => t.Players)
+                .FirstOrDefaultAsync(t => t.Id == id);
             if (team == null)
             {
                 return NotFound();
@@ -81,7 +82,7 @@ namespace CTFTournamentPlanner.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name")] Team team)
+        public async Task<IActionResult> Create([Bind("Id,Name`,Description")] Team team)
         {
             Player currentUser = await userManager.GetUserAsync(User);
             string currentUserId = await userManager.GetUserIdAsync(currentUser);
@@ -115,7 +116,7 @@ namespace CTFTournamentPlanner.Controllers
             return View(team);
         }
 
-
+        [Authorize]
         // GET: Teams/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -129,24 +130,37 @@ namespace CTFTournamentPlanner.Controllers
             {
                 return NotFound();
             }
+
+            Player currentUser = await userManager.GetUserAsync(User);
+            if (currentUser.TeamId != team.Id | currentUser.IsTeamLeader == false)
+            {
+                ModelState.AddModelError(string.Empty, "Je mag alleen gegevens van je eigen team aanpassen!");
+            }
+
             return View(team);
         }
 
         // POST: Teams/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [Authorize(Roles = "Teamleader, Moderator")]
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] Team team)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description")] Team team)
         {
             if (id != team.Id)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            Player currentUser = await userManager.GetUserAsync(User);
+            if (currentUser.TeamId != team.Id | currentUser.IsTeamLeader == false)
             {
+                ModelState.AddModelError(string.Empty, "Je mag alleen gegevens van je eigen team aanpassen!");
+            }
+
+            if (ModelState.IsValid)
+            {               
                 try
                 {
                     _context.Update(team);
@@ -229,9 +243,39 @@ namespace CTFTournamentPlanner.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> JoinTeam(int id)
+        {
+            Team team = await _context.Teams
+               .FirstOrDefaultAsync(m => m.Id == id);
+
+            Player currentUser = await userManager.GetUserAsync(User);
+            if (currentUser.TeamId != null)
+            {
+                ModelState.AddModelError("", "Je moet eerst je huidige team verlaten voordat je een ander team kan joinen.");
+            }
+
+            if (currentUser.TeamId == team.Id)
+            {
+                ModelState.AddModelError("", "Je zit al in dit team.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View("Details", team);
+            }
+
+
+            team.Players.Add(currentUser);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Details", new { id });
+        }
+
         private bool TeamExists(int id)
         {
             return (_context.Teams?.Any(e => e.Id == id)).GetValueOrDefault();
-        }
+        }            
     }
 }

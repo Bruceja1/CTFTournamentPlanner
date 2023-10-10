@@ -19,8 +19,7 @@ namespace CTFTournamentPlanner.Controllers
             return View();
         }
 
-        [Authorize(Roles = "Administrators")]
-        public IActionResult Privacy()
+        public IActionResult UserManual()
         {
             return View();
         }

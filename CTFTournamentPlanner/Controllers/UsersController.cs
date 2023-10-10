@@ -8,12 +8,12 @@ using System.Runtime.Intrinsics.X86;
 
 namespace CTFTournamentPlanner.Controllers
 {
-    public class AdminController : Controller
+    public class UsersController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<Player> userManager;
         private IPasswordHasher<Player> passwordHasher;
-        public AdminController(ApplicationDbContext context, UserManager<Player> userManager)
+        public UsersController(ApplicationDbContext context, UserManager<Player> userManager)
         {
             _context = context;
             this.userManager = userManager;
@@ -30,11 +30,35 @@ namespace CTFTournamentPlanner.Controllers
             // return View(userManager.Users);
             return View(viewModel);
         }
+        public async Task<IActionResult> Details(string? id)
+        {
+            if (id == null || _context.Users == null)
+            {
+                return NotFound();
+            }
 
-        [Authorize(Roles = "Administrators")]
+            Player player = _context.Users
+                .Include(p => p.Team)
+                .FirstOrDefault(p => p.Id == id);
+
+            if (player == null)
+            {
+                return NotFound();
+            }
+
+            return View(player);
+        }
+
+        [Authorize]
         public async Task<IActionResult> Edit(string id)
         {
             Player player = await userManager.FindByIdAsync(id);
+            Player currentUser = await userManager.GetUserAsync(User);
+            if (currentUser.Id != player.Id)
+            {
+                ModelState.AddModelError("", "Je mag alleen je eigen gegevens wijzigen!"); 
+            }
+
             if (player != null)
                 return View(player);
             else
@@ -91,7 +115,7 @@ namespace CTFTournamentPlanner.Controllers
             foreach (IdentityError error in result.Errors)
                 ModelState.AddModelError("", error.Description);
         }
-
+   
         [Authorize (Roles = "Administrators")]
         public async Task<IActionResult> Delete(string id)
         {

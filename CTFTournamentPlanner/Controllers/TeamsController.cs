@@ -82,7 +82,7 @@ namespace CTFTournamentPlanner.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name`,Description")] Team team)
+        public async Task<IActionResult> Create([Bind("Id,Name,Description")] Team team)
         {
             Player currentUser = await userManager.GetUserAsync(User);
             string currentUserId = await userManager.GetUserIdAsync(currentUser);
@@ -154,10 +154,16 @@ namespace CTFTournamentPlanner.Controllers
             }
 
             Player currentUser = await userManager.GetUserAsync(User);
-            if (currentUser.TeamId != team.Id | currentUser.IsTeamLeader == false)
+            if (currentUser.TeamId != team.Id)       
             {
-                ModelState.AddModelError(string.Empty, "Je mag alleen gegevens van je eigen team aanpassen!");
+                ModelState.AddModelError("", "Je mag alleen gegevens van je eigen team aanpassen!");
             }
+
+            if (currentUser.IsTeamLeader == false)
+            {
+                ModelState.AddModelError("", "Alleen de teamleider mag teamgegevens aanpassen.");
+            }
+
 
             if (ModelState.IsValid)
             {               
@@ -247,11 +253,10 @@ namespace CTFTournamentPlanner.Controllers
         [HttpPost]
         public async Task<IActionResult> JoinTeam(int id)
         {
-            Team team = await _context.Teams
-               .FirstOrDefaultAsync(m => m.Id == id);
+            Team team = await _context.Teams.FirstOrDefaultAsync(m => m.Id == id);
 
             Player currentUser = await userManager.GetUserAsync(User);
-            if (currentUser.TeamId != null)
+            if (currentUser.IsTeamLeader == true)
             {
                 ModelState.AddModelError("", "Je moet eerst je huidige team verlaten voordat je een ander team kan joinen.");
             }
@@ -263,14 +268,13 @@ namespace CTFTournamentPlanner.Controllers
 
             if (!ModelState.IsValid)
             {
-                return View("Details", team);
+                return RedirectToAction("Details", team);
             }
 
-
-            team.Players.Add(currentUser);
+            currentUser.TeamId = team.Id;
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("Details", new { id });
+            return RedirectToAction("Details", team);
         }
 
         private bool TeamExists(int id)

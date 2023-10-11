@@ -7,7 +7,11 @@
 <h1>@Html.DisplayFor(model => model.Name)</h1>
 <h3 class="mt-5">Beschrijving</h3>
 <p>@Html.DisplayFor(model => model.Description)</p>
-<a class="btn btn-sm btn-primary" asp-controller="Teams" asp-action="JoinTeam" asp-route-id="@Model.Id">Join Team</a>
+<p>@Html.ValidationSummary(false)</p>
+
+<form method="post" asp-controller="Teams" asp-action="JoinTeam" asp-route-id="@Model.Id">
+    <button type="submit" class="btn btn-primary">Join Team</button>
+</form>
 
 
 <table class="table">

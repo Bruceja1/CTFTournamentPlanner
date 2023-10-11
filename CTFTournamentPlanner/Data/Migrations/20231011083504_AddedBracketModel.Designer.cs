@@ -4,6 +4,7 @@ using CTFTournamentPlanner.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CTFTournamentPlanner.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231011083504_AddedBracketModel")]
+    partial class AddedBracketModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,23 +24,6 @@ namespace CTFTournamentPlanner.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("CTFTournamentPlanner.Models.Bracket", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Brackets");
-                });
 
             modelBuilder.Entity("CTFTournamentPlanner.Models.Player", b =>
                 {
@@ -120,9 +106,6 @@ namespace CTFTournamentPlanner.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("BracketId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Description")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -132,8 +115,6 @@ namespace CTFTournamentPlanner.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("BracketId");
 
                     b.ToTable("Teams");
                 });
@@ -284,13 +265,6 @@ namespace CTFTournamentPlanner.Data.Migrations
                     b.Navigation("Team");
                 });
 
-            modelBuilder.Entity("CTFTournamentPlanner.Models.Team", b =>
-                {
-                    b.HasOne("CTFTournamentPlanner.Models.Bracket", null)
-                        .WithMany("Teams")
-                        .HasForeignKey("BracketId");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -340,11 +314,6 @@ namespace CTFTournamentPlanner.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("CTFTournamentPlanner.Models.Bracket", b =>
-                {
-                    b.Navigation("Teams");
                 });
 
             modelBuilder.Entity("CTFTournamentPlanner.Models.Team", b =>

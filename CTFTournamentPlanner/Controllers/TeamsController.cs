@@ -91,7 +91,7 @@ namespace CTFTournamentPlanner.Controllers
             bool userHasTeam = _context.Users.Any(p => p.Id == currentUserId && p.TeamId != null);
             if (userHasTeam)
             {
-                ModelState.AddModelError(string.Empty, "Om een nieuw team aan te maken moet je eerst je huidige team verlaten.");
+                ModelState.AddModelError("", "Om een nieuw team aan te maken moet je eerst je huidige team verlaten.");
             }
             
             
@@ -101,7 +101,7 @@ namespace CTFTournamentPlanner.Controllers
                 var existingTeam = await _context.Teams.FirstOrDefaultAsync(t => t.Name == team.Name);
                 if (existingTeam != null)
                 {                  
-                    ModelState.AddModelError(string.Empty, "Dit team bestaat al.");                    
+                    ModelState.AddModelError("", "Dit team bestaat al.");                    
                 }
 
                 // Huidige gebruiker toevoegen aan het team.
@@ -134,7 +134,7 @@ namespace CTFTournamentPlanner.Controllers
             Player currentUser = await userManager.GetUserAsync(User);
             if (currentUser.TeamId != team.Id | currentUser.IsTeamLeader == false)
             {
-                ModelState.AddModelError(string.Empty, "Je mag alleen gegevens van je eigen team aanpassen!");
+                ModelState.AddModelError("", "Alleen de teamleider van dit team mag teamgegevens aanpassen.");
             }
 
             return View(team);
@@ -154,14 +154,9 @@ namespace CTFTournamentPlanner.Controllers
             }
 
             Player currentUser = await userManager.GetUserAsync(User);
-            if (currentUser.TeamId != team.Id)       
+            if (currentUser.TeamId != team.Id | currentUser.IsTeamLeader == false)       
             {
-                ModelState.AddModelError("", "Je mag alleen gegevens van je eigen team aanpassen!");
-            }
-
-            if (currentUser.IsTeamLeader == false)
-            {
-                ModelState.AddModelError("", "Alleen de teamleider mag teamgegevens aanpassen.");
+                ModelState.AddModelError("", "Alleen de teamleider van dit team mag teamgegevens aanpassen.");
             }
 
 
@@ -256,14 +251,15 @@ namespace CTFTournamentPlanner.Controllers
             Team team = await _context.Teams.FirstOrDefaultAsync(m => m.Id == id);
 
             Player currentUser = await userManager.GetUserAsync(User);
-            if (currentUser.IsTeamLeader == true)
-            {
-                ModelState.AddModelError("", "Je moet eerst je huidige team verlaten voordat je een ander team kan joinen.");
-            }
 
             if (currentUser.TeamId == team.Id)
             {
                 ModelState.AddModelError("", "Je zit al in dit team.");
+            }
+
+            if (currentUser.IsTeamLeader == true)
+            {
+                ModelState.AddModelError("", "Je moet eerst je huidige team verlaten voordat je een ander team kan joinen.");
             }
 
             if (!ModelState.IsValid)

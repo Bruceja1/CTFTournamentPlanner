@@ -10,6 +10,6 @@ namespace CTFTournamentPlanner.Models
         public ICollection<Player>? Players { get; set; }
         [MaxLength(100)]
         public string? Description { get; set; }
-        public ICollection<Bracket> Brackets { get; set; }
+        public ICollection<Bracket>? Brackets { get; set; }
     }
 }

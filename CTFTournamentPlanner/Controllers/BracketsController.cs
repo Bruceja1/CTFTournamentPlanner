@@ -175,7 +175,6 @@ namespace CTFTournamentPlanner.Controllers
             Player currentUser = await userManager.GetUserAsync(User);
             Team currentUserTeam = await _context.Teams.FirstOrDefaultAsync(t => t.Id == currentUser.TeamId);
                                 
-
             if (currentUser.IsTeamLeader == false || currentUser.TeamId == null)
             {
                 ModelState.AddModelError("", "Alleen teamleiders kunnen hun team aanmelden voor een toernament.");

@@ -1,0 +1,33 @@
+﻿@model CTFTournamentPlanner.Models.Bracket
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Bracket</h4>
+    <hr />
+
+    @foreach (Team team in Model.Teams)
+    {
+        <p>@team.Name</p>
+    }
+    <form method="post" asp-action="SignUp" asp-route-id="@Model.Id">
+        <button type="submit" class="btn btn-primary">Team Aanmelden</button>
+    </form>
+
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

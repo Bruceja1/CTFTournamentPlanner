@@ -7,6 +7,7 @@ namespace CTFTournamentPlanner.Data
     public class ApplicationDbContext : IdentityDbContext<Player>
     {
         public DbSet<Team> Teams { get; set; }
+        public DbSet<Bracket> Brackets { get; set; }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {

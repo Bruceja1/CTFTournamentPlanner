@@ -8,16 +8,19 @@ using Microsoft.EntityFrameworkCore;
 using CTFTournamentPlanner.Data;
 using CTFTournamentPlanner.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace CTFTournamentPlanner.Controllers
 {
     public class BracketsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<Player> userManager;
 
-        public BracketsController(ApplicationDbContext context)
+        public BracketsController(ApplicationDbContext context, UserManager<Player> userManager)
         {
             _context = context;
+            this.userManager = userManager;
         }
 
         // GET: Brackets
@@ -37,6 +40,7 @@ namespace CTFTournamentPlanner.Controllers
             }
 
             var bracket = await _context.Brackets
+                .Include(b => b.Teams)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (bracket == null)
             {
@@ -46,6 +50,7 @@ namespace CTFTournamentPlanner.Controllers
             return View(bracket);
         }
 
+        [Authorize (Roles ="Administrators")]
         // GET: Brackets/Create
         public IActionResult Create()
         {
@@ -69,6 +74,7 @@ namespace CTFTournamentPlanner.Controllers
             return View(bracket);
         }
 
+        [Authorize(Roles = "Administrators")]
         // GET: Brackets/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -88,6 +94,7 @@ namespace CTFTournamentPlanner.Controllers
         // POST: Brackets/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Administrators")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] Bracket bracket)
@@ -120,6 +127,7 @@ namespace CTFTournamentPlanner.Controllers
             return View(bracket);
         }
 
+        [Authorize(Roles = "Administrators")]
         // GET: Brackets/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
@@ -139,6 +147,7 @@ namespace CTFTournamentPlanner.Controllers
         }
 
         // POST: Brackets/Delete/5
+        [Authorize (Roles = "Administrators")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -155,6 +164,33 @@ namespace CTFTournamentPlanner.Controllers
             
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        [Authorize]
+        public async Task<IActionResult> SignUp(int id)
+        {
+            Bracket bracket = await _context.Brackets
+                .Include(b => b.Teams)
+                .FirstOrDefaultAsync(m => m.Id == id);
+            Player currentUser = await userManager.GetUserAsync(User);
+            Team currentUserTeam = await _context.Teams.FirstOrDefaultAsync(t => t.Id == currentUser.TeamId);
+                                
+
+            if (currentUser.IsTeamLeader == false || currentUser.TeamId == null)
+            {
+                ModelState.AddModelError("", "Alleen teamleiders kunnen hun team aanmelden voor een toernament.");
+                return View(bracket);
+            }
+
+            if (bracket == null)
+            {
+                return NotFound();
+            }
+
+            bracket.Teams.Add(currentUserTeam);
+            await _context.SaveChangesAsync();
+
+            return View("Details", bracket);
         }
 
         private bool BracketExists(int id)

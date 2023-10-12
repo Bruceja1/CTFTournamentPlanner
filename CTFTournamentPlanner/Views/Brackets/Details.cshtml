@@ -9,6 +9,15 @@
 <div>
     <h4>Bracket</h4>
     <hr />
+
+    @foreach (Team team in Model.Teams)
+    {
+        <p>@team.Name</p>
+    }
+    <form method="post" asp-action="SignUp" asp-route-id="@Model.Id">
+        <button type="submit" class="btn btn-primary">Team Aanmelden</button>
+    </form>
+
     <dl class="row">
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Name)

@@ -8,12 +8,12 @@ using System.Runtime.Intrinsics.X86;
 
 namespace CTFTournamentPlanner.Controllers
 {
-    public class UsersController : Controller
+    public class PlayersController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<Player> userManager;
         private IPasswordHasher<Player> passwordHasher;
-        public UsersController(ApplicationDbContext context, UserManager<Player> userManager)
+        public PlayersController(ApplicationDbContext context, UserManager<Player> userManager)
         {
             _context = context;
             this.userManager = userManager;

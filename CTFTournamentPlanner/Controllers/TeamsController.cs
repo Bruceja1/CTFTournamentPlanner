@@ -276,6 +276,6 @@ namespace CTFTournamentPlanner.Controllers
         private bool TeamExists(int id)
         {
             return (_context.Teams?.Any(e => e.Id == id)).GetValueOrDefault();
-        }            
+        }
     }
 }

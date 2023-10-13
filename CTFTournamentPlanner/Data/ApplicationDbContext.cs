@@ -8,6 +8,9 @@ namespace CTFTournamentPlanner.Data
     {
         public DbSet<Team> Teams { get; set; }
         public DbSet<Bracket> Brackets { get; set; }
+        public DbSet<Round> Rounds { get; set; }
+        public DbSet<Matchup> Matchups { get; set; }
+        
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {

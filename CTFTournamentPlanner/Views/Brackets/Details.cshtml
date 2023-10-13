@@ -21,8 +21,12 @@
         {
             teams.Add(team.Name);
         }
-        <p> Het eerste team is: @teams[0]</p>
-        <p>Het tweede team is: @teams[1]</p>
+
+        @if (teams.Count() >= 2)
+        {
+            <p> Het eerste team is: @teams[0]</p>
+            <p>Het tweede team is: @teams[1]</p>
+        }
     }
 
     

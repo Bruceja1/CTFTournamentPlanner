@@ -192,6 +192,17 @@ namespace CTFTournamentPlanner.Controllers
             return View("Details", bracket);
         }
 
+        /*
+        public async Task<IActionResult> GenerateBracket(int id)
+        {
+            Bracket bracket = await _context.Brackets
+                .Include(b => b.Teams)
+                .FirstOrDefaultAsync(b => b.Id == id);
+                                               
+
+        }
+        */
+
         private bool BracketExists(int id)
         {
           return (_context.Brackets?.Any(e => e.Id == id)).GetValueOrDefault();

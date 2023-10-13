@@ -5,6 +5,8 @@
         public int Id { get; set; }
         public string Name { get; set; }
         public ICollection<Team>? Teams { get; set; }
+        public ICollection<Round>? Rounds { get; set; }
         public bool IsActive { get; set; } = true;
+        
     }
 }

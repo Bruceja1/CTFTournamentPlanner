@@ -4,6 +4,7 @@ using CTFTournamentPlanner.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CTFTournamentPlanner.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231013082426_AddedRoundsAndMatchups")]
+    partial class AddedRoundsAndMatchups
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -156,12 +159,7 @@ namespace CTFTournamentPlanner.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("BracketId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("BracketId");
 
                     b.ToTable("Rounds");
                 });
@@ -360,13 +358,6 @@ namespace CTFTournamentPlanner.Data.Migrations
                     b.Navigation("Team");
                 });
 
-            modelBuilder.Entity("CTFTournamentPlanner.Models.Round", b =>
-                {
-                    b.HasOne("CTFTournamentPlanner.Models.Bracket", null)
-                        .WithMany("Rounds")
-                        .HasForeignKey("BracketId");
-                });
-
             modelBuilder.Entity("CTFTournamentPlanner.Models.Team", b =>
                 {
                     b.HasOne("CTFTournamentPlanner.Models.Matchup", null)
@@ -423,11 +414,6 @@ namespace CTFTournamentPlanner.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("CTFTournamentPlanner.Models.Bracket", b =>
-                {
-                    b.Navigation("Rounds");
                 });
 
             modelBuilder.Entity("CTFTournamentPlanner.Models.Matchup", b =>

@@ -172,6 +172,13 @@ namespace CTFTournamentPlanner.Controllers
             Bracket bracket = await _context.Brackets
                 .Include(b => b.Teams)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (bracket.IsActive == false)
+            {
+                ModelState.AddModelError("", "Deze bracket is niet meer actief.");
+                return View("Details", id);
+            }
+
             Player currentUser = await userManager.GetUserAsync(User);
             Team currentUserTeam = await _context.Teams.FirstOrDefaultAsync(t => t.Id == currentUser.TeamId);
                                 
@@ -191,17 +198,70 @@ namespace CTFTournamentPlanner.Controllers
 
             return View("Details", bracket);
         }
-
-        /*
+               
         public async Task<IActionResult> GenerateBracket(int id)
         {
             Bracket bracket = await _context.Brackets
                 .Include(b => b.Teams)
                 .FirstOrDefaultAsync(b => b.Id == id);
-                                               
+
+            List<Team> teams = bracket.Teams.ToList();
+
+            if (bracket.IsActive == false)
+            {
+                ModelState.AddModelError("", "Deze bracket is niet meer actief.");
+                return View("Details", id);
+            }
+
+            // Stel: Teams.Count = 8. 2^n = 8 -> n = 3 dus aantal rondes = log2(8).
+            // Stel: Teams.Count = 6. log2(6) = 2,584..., dus naar boven afronden.
+            double roundCount = Math.Ceiling(Math.Log2(bracket.Teams.Count));
+
+            List<Round> rounds = new List<Round>();
+            for (int i = 1; i <= roundCount; i++)
+            {
+                Round round = new Round();
+                round.BracketId = bracket.Id;
+
+                if (i == roundCount)
+                {
+                    round.Name = "Finale";
+                }
+
+                if (i == roundCount - 1)
+                {
+                    round.Name = "Halve Finale";
+                }
+
+                else
+                    round.Name = $"Ronde {i}";
+
+                rounds.Add(round);
+                _context.Rounds.Add(round);
+                await _context.SaveChangesAsync();
+            }
+
+            foreach (Round round in rounds)
+            {
+                Matchup matchup = new Matchup();
+
+            }
+
+            
+            return View("Details", bracket);
 
         }
-        */
+
+        public async Task<IActionResult> ArchiveBracket(int id)
+        {
+            Bracket bracket = await _context.Brackets
+                .FirstOrDefaultAsync(b => b.Id == id);
+ 
+            _context.Update(bracket.IsActive == false);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
 
         private bool BracketExists(int id)
         {

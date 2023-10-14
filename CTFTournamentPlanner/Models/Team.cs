@@ -11,5 +11,6 @@ namespace CTFTournamentPlanner.Models
         [MaxLength(100)]
         public string? Description { get; set; }
         public ICollection<Bracket>? Brackets { get; set; }
+        public ICollection<Matchup>? Matchups { get; set; }
     }
 }

@@ -4,6 +4,7 @@ using CTFTournamentPlanner.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,13 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CTFTournamentPlanner.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231014120550_AddedBracketIdAndRoundId")]
+    partial class AddedBracketIdAndRoundId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.11")
+                .HasAnnotation("ProductVersion", "7.0.12")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -190,28 +193,18 @@ namespace CTFTournamentPlanner.Data.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<int?>("MatchupId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("MatchupId");
+
                     b.ToTable("Teams");
-                });
-
-            modelBuilder.Entity("MatchupTeam", b =>
-                {
-                    b.Property<int>("MatchupsId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TeamsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("MatchupsId", "TeamsId");
-
-                    b.HasIndex("TeamsId");
-
-                    b.ToTable("MatchupTeam");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -389,19 +382,11 @@ namespace CTFTournamentPlanner.Data.Migrations
                         .HasForeignKey("BracketId");
                 });
 
-            modelBuilder.Entity("MatchupTeam", b =>
+            modelBuilder.Entity("CTFTournamentPlanner.Models.Team", b =>
                 {
                     b.HasOne("CTFTournamentPlanner.Models.Matchup", null)
-                        .WithMany()
-                        .HasForeignKey("MatchupsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CTFTournamentPlanner.Models.Team", null)
-                        .WithMany()
-                        .HasForeignKey("TeamsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany("Teams")
+                        .HasForeignKey("MatchupId");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -458,6 +443,11 @@ namespace CTFTournamentPlanner.Data.Migrations
             modelBuilder.Entity("CTFTournamentPlanner.Models.Bracket", b =>
                 {
                     b.Navigation("Rounds");
+                });
+
+            modelBuilder.Entity("CTFTournamentPlanner.Models.Matchup", b =>
+                {
+                    b.Navigation("Teams");
                 });
 
             modelBuilder.Entity("CTFTournamentPlanner.Models.Round", b =>

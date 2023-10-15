@@ -14,6 +14,24 @@
     {
         <p>@team.Name</p>
     }
+
+    @{
+        List<string> teams = new List<string>();
+        foreach (Team team in Model.Teams) 
+        {
+            teams.Add(team.Name);
+        }
+
+        @if (teams.Count() >= 2)
+        {
+            <p> Het eerste team is: @teams[0]</p>
+            <p>Het tweede team is: @teams[1]</p>
+        }
+    }
+
+@Html.Partial("_GeneratedBracket")
+
+    
     <form method="post" asp-action="SignUp" asp-route-id="@Model.Id">
         <button type="submit" class="btn btn-primary">Team Aanmelden</button>
     </form>

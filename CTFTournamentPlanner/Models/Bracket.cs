@@ -7,6 +7,6 @@
         public ICollection<Team>? Teams { get; set; }
         public ICollection<Round>? Rounds { get; set; }
         public bool IsActive { get; set; } = true;
-        
+        public bool IsGenerated { get; set; } = false;
     }
 }

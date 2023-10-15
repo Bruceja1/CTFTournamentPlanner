@@ -4,6 +4,7 @@ using CTFTournamentPlanner.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CTFTournamentPlanner.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231015181549_AddedDatabaseSeeding5")]
+    partial class AddedDatabaseSeeding5
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -161,32 +164,30 @@ namespace CTFTournamentPlanner.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "56e556ef-c1a0-46d2-8b95-899663536bf7",
+                            Id = "ba689e1a-d781-4467-97a7-e4579d8ac5b6",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "e103e209-aa44-4775-af1c-b78fc46801a7",
+                            ConcurrencyStamp = "c20e8ff3-01a9-4ba0-800f-13bdf0d66c26",
                             Email = "bruce@example.com",
-                            EmailConfirmed = true,
+                            EmailConfirmed = false,
                             IsTeamLeader = true,
                             LockoutEnabled = false,
-                            PasswordHash = "AQAAAAIAAYagAAAAENxsp4f7rdOj0XMuKWF9ORD7Q1wfRl/RH3T8Br/QKG514Hu9M4AYh8Ov4yR782F+2w==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "284e80bc-e95f-4cd4-bcf5-e05644da0928",
+                            SecurityStamp = "e332e21f-b922-4090-af44-560a5a93448f",
                             TeamId = 1,
                             TwoFactorEnabled = false,
                             UserName = "Bruce"
                         },
                         new
                         {
-                            Id = "67db9434-b342-4fd5-9dde-befa2da1f4d1",
+                            Id = "21936976-6a82-4854-9380-9fec015fd04e",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "f64a142c-f04c-43ba-952d-7f26b0f7ac34",
+                            ConcurrencyStamp = "1cec83f0-3915-4ef9-95ea-2acd9e2701af",
                             Email = "octane@example.com",
-                            EmailConfirmed = true,
+                            EmailConfirmed = false,
                             IsTeamLeader = true,
                             LockoutEnabled = false,
-                            PasswordHash = "AQAAAAIAAYagAAAAEDgqK8GeXTUvBk0b2zDXompUPNmaOlx3Ems1GryhfK3mDrvKtvxP0812rhA04AfvRg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "23e702d7-dcfd-4752-8cb1-b06264ce35a1",
+                            SecurityStamp = "72d3b52e-f56d-4b2b-8476-f26c45442321",
                             TeamId = 2,
                             TwoFactorEnabled = false,
                             UserName = "Octane"

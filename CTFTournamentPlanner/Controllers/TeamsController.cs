@@ -238,6 +238,7 @@ namespace CTFTournamentPlanner.Controllers
             else
             {
                 _context.Teams.Remove(team);
+                currentUser.IsTeamLeader = false;
                 await _context.SaveChangesAsync();
             }
                                  

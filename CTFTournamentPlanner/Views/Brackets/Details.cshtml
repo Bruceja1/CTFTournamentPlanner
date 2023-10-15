@@ -29,13 +29,19 @@
         }
     }
 
-@Html.Partial("_GeneratedBracket")
 
+    @if (Model.IsGenerated == true)
+    {
+        <div>@await Html.PartialAsync("_GeneratedBracket", Model)</div>
+    }
+    else
+    {  
+        <form method="post" asp-controller="Brackets" asp-action="GenerateBracket" asp-route-id="@Model.Id">
+            <button type="submit" class="btn btn-primary">Bracket Genereren</button>
+        </form>
+    }
+   
     
-    <form method="post" asp-action="SignUp" asp-route-id="@Model.Id">
-        <button type="submit" class="btn btn-primary">Team Aanmelden</button>
-    </form>
-
     <dl class="row">
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Name)

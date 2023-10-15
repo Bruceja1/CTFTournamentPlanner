@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CTFTournamentPlanner.Models
 {
@@ -6,6 +7,7 @@ namespace CTFTournamentPlanner.Models
     {
         public int? TeamId { get; set; }
         public Team? Team { get; set; }
-        public bool IsTeamLeader {  get; set; }
+        [Column]
+        public bool IsTeamLeader { get; set; } = false;
     }
 }

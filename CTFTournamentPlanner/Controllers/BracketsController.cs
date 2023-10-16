@@ -181,6 +181,8 @@ namespace CTFTournamentPlanner.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // Aangezien het niet praktisch is om elk team individueel aan te moeten melden om deel te nemen aan een bracket, is deze
+        // functionaliteit voor deze inleveropdracht eruit gehaald.
         /*
         [Authorize]
         public async Task<IActionResult> SignUp(int id)
@@ -311,8 +313,9 @@ namespace CTFTournamentPlanner.Controllers
                 // ronde. Dus aantal matchups naar beneden afronden.
                 for (double j = Math.Floor((double)i / 2); j > 0; j--)
                 {
-                    Matchup matchup = new Matchup();                  
-                    round.Matchups.Add(matchup);
+                    Matchup matchup = new Matchup();
+                    matchup.Teams = new List<Team>();
+                    matchup.RoundId = round.Id;
 
                     // In de eerste ronde wordt elk team willekeurig ingedeeld.
                     if (i == teams.Count())
@@ -329,7 +332,7 @@ namespace CTFTournamentPlanner.Controllers
                 // Elke ronde wordt het aantal teams gehalveerd.
                 i /= 2;
             }
-            _context.Update(bracket.IsGenerated = true);
+            bracket.IsGenerated = true;
             await _context.SaveChangesAsync();
             return View("Details", bracket);
         }

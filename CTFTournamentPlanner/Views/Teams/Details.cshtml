@@ -42,17 +42,9 @@
                 
             <td>
                 <ul>
-                @{
-                    int count = 0;
-                }
                 @foreach (var player in Model.Players)
-                {
-                    if (count < 4)
-                    {
-                        <li>@player.UserName </li>
-
-                    }
-                    count++;
+                {                   
+                    <li>@player.UserName </li>                                   
                 }
                 </ul>
             </td>

@@ -12,7 +12,14 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<Player>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddLogging(builder => builder.AddDebug().AddConsole());
+
+builder.Services.AddDefaultIdentity<Player>(options =>
+{
+    options.SignIn.RequireConfirmedAccount = false;
+    options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+    options.User.RequireUniqueEmail = true;
+})
     .AddRoles<IdentityRole>() // enable role management
     .AddEntityFrameworkStores<ApplicationDbContext>();
     

@@ -41,6 +41,7 @@ public class RolesController : Controller
                 }
             }
         }
+        
         if (!user.EmailConfirmed)
         {
             string token = await userManager
@@ -59,6 +60,7 @@ public class RolesController : Controller
                 }
             }
         }
+        
         if (!(await userManager.IsInRoleAsync(user, AdminRole)))
         {
             IdentityResult result = await userManager.AddToRoleAsync(user,

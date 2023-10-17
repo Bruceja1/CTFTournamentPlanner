@@ -4,7 +4,7 @@
     ViewData["Title"] = "Details";
 }
 
-@if (!Model.IsGenerated == true)
+@if (Model.IsGenerated == false)
 {
     <h1>@Model.Name</h1>
 

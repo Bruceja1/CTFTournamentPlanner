@@ -295,7 +295,7 @@ namespace CTFTournamentPlanner.Controllers
                 ModelState.AddModelError("", "Je zit niet in dit team.");
             }
 
-            if (currentUser.IsTeamLeader == true)
+            if (currentUser.TeamId == team.Id && currentUser.IsTeamLeader == true)
             {
                 return View("Delete", team);
             }

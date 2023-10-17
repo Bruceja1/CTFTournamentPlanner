@@ -230,7 +230,17 @@ namespace CTFTournamentPlanner.Controllers
                         .ThenInclude(m => m.Teams)
                 .FirstOrDefaultAsync(b => b.Id == id);
 
-            List<Team> teams = bracket.Teams.ToList();
+            // Volgorde teams verwisselen met de Fisher-Yates shuffle zodat teams willekeurig ingedeeld kunnen worden.
+            List<Team> teams = bracket.Teams.ToList();           
+            int n = teams.Count();
+            while (n > 1)
+            {
+                n--;
+                int k = rng.Next(n + 1);
+                Team value = teams[k];
+                teams[k] = teams[n];
+                teams[n] = value;
+            }
 
             if (bracket == null | bracket.Teams == null)
             {
@@ -248,12 +258,12 @@ namespace CTFTournamentPlanner.Controllers
                 return View("Details", id);
             }
 
-            if (bracket.Teams.Count() < 4)
+            if (teams.Count() < 4)
             {
                 ModelState.AddModelError("", "Er moeten minimaal vier teams aangemeld zijn voor het toernament.");
             }
 
-            if (bracket.Teams.Count() / 4 != 0)
+            if (teams.Count() / 4 != 0)
             {
                 ModelState.AddModelError("", "Het aantal teams moet deelbaar zijn door vier.");
             }
@@ -263,7 +273,6 @@ namespace CTFTournamentPlanner.Controllers
             // Stel: Teams.Count = 6. log2(6) = 2,584..., dus naar boven afronden.
             double roundCount = Math.Ceiling(Math.Log2(bracket.Teams.Count));
 
-            List<Round> rounds = new List<Round>();
             for (int h = 1; h <= roundCount; h++)
             {
                 Round round = new Round();
@@ -281,28 +290,42 @@ namespace CTFTournamentPlanner.Controllers
 
                 else
                     round.Name = $"Ronde {h}";
-
-                rounds.Add(round);
+              
                 _context.Rounds.Add(round);
-                await _context.SaveChangesAsync();
-            }
+                // await _context.SaveChangesAsync();
+                double i = teams.Count();
 
-            // Volgorde teams verwisselen met de Fisher-Yates shuffle zodat teams willekeurig ingedeeld kunnen worden.
-            int n = teams.Count();
-            while (n > 1)
-            {
-                n--;
-                int k = rng.Next(n + 1);
-                Team value = teams[k];
-                teams[k] = teams[n];
-                teams[n] = value;
-            }
+                // 'j' representeert het aantal matchups in de ronde, dus het aantal teams gedeeld door twee.
+                // Stel dat het aantal teams in een ronde oneven is; het alleenstaande team wordt dan doorgeschoven naar de volgende
+                // ronde. Dus aantal matchups naar beneden afronden.
+                for (double j = Math.Floor((double)i / 2); j > 0; j--)
+                {
+                    Matchup matchup = new Matchup();
+                    matchup.Teams = new List<Team>();
+                    matchup.RoundId = round.Id;
 
+                    // In de eerste ronde wordt elk team willekeurig ingedeeld.
+                    if (i == bracket.Teams.ToList().Count())
+                    {
+                        matchup.Teams.Add(teams[teams.Count() - 1]);
+                        teams.RemoveAt(teams.Count() - 1);
+                        matchup.Teams.Add(teams[teams.Count() - 1]);
+                        teams.RemoveAt(teams.Count() - 1);
+
+                    }
+                    _context.Matchups.Add(matchup);
+                }
+                i /= 2;
+                // i = Math.Floor(i / 2);
+            }
+         
+            /*
             // Variable om bij te houden hoeveel teams er in de ronde zitten.
             double i = teams.Count();
 
+            List<Matchup> matchups = new List<Matchup>();
             foreach (Round round in rounds)
-            {
+            {               
                 // Alleen als er in de betreffende ronde twee of meer teams zijn worden er matchups gemaakt.
                 // De while (i >= 2) is hier weggehaald. Test of het zo goed is, anders terugzetten!
 
@@ -316,7 +339,7 @@ namespace CTFTournamentPlanner.Controllers
                     Matchup matchup = new Matchup();
                     matchup.Teams = new List<Team>();
                     matchup.RoundId = round.Id;
-
+                   
                     // In de eerste ronde wordt elk team willekeurig ingedeeld.
                     if (i == teams.Count())
                     {
@@ -325,13 +348,15 @@ namespace CTFTournamentPlanner.Controllers
                         matchup.Teams.Add(teams[p]);
                         p--;
                     }
+                    matchups.Add(matchup);
                 }
-
-                await _context.SaveChangesAsync();
+                
 
                 // Elke ronde wordt het aantal teams gehalveerd.
                 i /= 2;
             }
+            */
+
             bracket.IsGenerated = true;
             await _context.SaveChangesAsync();
             return View("Details", bracket);

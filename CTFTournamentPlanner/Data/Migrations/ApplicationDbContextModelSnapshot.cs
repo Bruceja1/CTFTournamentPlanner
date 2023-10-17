@@ -34,7 +34,7 @@ namespace CTFTournamentPlanner.Data.Migrations
 
                     b.HasIndex("TeamsId");
 
-                    b.ToTable("BracketTeam");
+                    b.ToTable("BracketTeam", (string)null);
                 });
 
             modelBuilder.Entity("CTFTournamentPlanner.Models.Bracket", b =>
@@ -57,7 +57,7 @@ namespace CTFTournamentPlanner.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Brackets");
+                    b.ToTable("Brackets", (string)null);
                 });
 
             modelBuilder.Entity("CTFTournamentPlanner.Models.Matchup", b =>
@@ -83,7 +83,7 @@ namespace CTFTournamentPlanner.Data.Migrations
 
                     b.HasIndex("RoundId");
 
-                    b.ToTable("Matchups");
+                    b.ToTable("Matchups", (string)null);
                 });
 
             modelBuilder.Entity("CTFTournamentPlanner.Models.Player", b =>
@@ -791,7 +791,7 @@ namespace CTFTournamentPlanner.Data.Migrations
 
                     b.HasIndex("BracketId");
 
-                    b.ToTable("Rounds");
+                    b.ToTable("Rounds", (string)null);
                 });
 
             modelBuilder.Entity("CTFTournamentPlanner.Models.Team", b =>
@@ -812,7 +812,7 @@ namespace CTFTournamentPlanner.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Teams");
+                    b.ToTable("Teams", (string)null);
 
                     b.HasData(
                         new
@@ -871,7 +871,7 @@ namespace CTFTournamentPlanner.Data.Migrations
 
                     b.HasIndex("TeamsId");
 
-                    b.ToTable("MatchupTeam");
+                    b.ToTable("MatchupTeam", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

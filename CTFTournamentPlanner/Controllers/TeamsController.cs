@@ -250,8 +250,12 @@ namespace CTFTournamentPlanner.Controllers
         public async Task<IActionResult> JoinTeam(int id)
         {
             Team team = await _context.Teams.FirstOrDefaultAsync(m => m.Id == id);
-
             Player currentUser = await userManager.GetUserAsync(User);
+
+            if (team == null | currentUser == null)
+            {
+                return NotFound();
+            }
 
             if (currentUser.TeamId == team.Id)
             {
@@ -271,6 +275,39 @@ namespace CTFTournamentPlanner.Controllers
             currentUser.TeamId = team.Id;
             await _context.SaveChangesAsync();
 
+            return RedirectToAction("Details", team);
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> LeaveTeam(int id)
+        {
+            Team team = await _context.Teams.FirstOrDefaultAsync(m => m.Id == id);
+            Player currentUser = await userManager.GetUserAsync(User);
+
+            if (team == null | currentUser == null)
+            {
+                return NotFound();
+            }
+
+            if (currentUser.TeamId != team.Id | currentUser.TeamId == null)
+            {
+                ModelState.AddModelError("", "Je zit niet in dit team.");
+            }
+
+            if (currentUser.IsTeamLeader == true)
+            {
+                return View("Delete", team);
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return RedirectToAction("Details", team);
+            }
+
+            currentUser.TeamId = null;
+
+            await _context.SaveChangesAsync();
             return RedirectToAction("Details", team);
         }
 

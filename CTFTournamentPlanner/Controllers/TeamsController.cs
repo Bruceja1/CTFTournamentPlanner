@@ -27,18 +27,16 @@ namespace CTFTournamentPlanner.Controllers
         // GET: Teams      
         public async Task<IActionResult> Index()
         {
-            var viewModel = new TeamIndexViewModel
-            {
-                Teams = _context.Teams.Include(t => t.Players).ToList(),
-                Players = _context.Users.ToList()
-            };
+            var teams = await _context.Teams
+                .Include(t => t.Players)
+                .ToListAsync();
 
             if (_context.Teams == null)
             {
                 return Problem("Entity set 'ApplicationDbContext.Teams'  is null.");
             }
 
-            return View(viewModel);           
+            return View(teams);
         }
 
         // GET: Teams/Details/5

@@ -101,7 +101,12 @@ namespace CTFTournamentPlanner.Controllers
                 return NotFound();
             }
 
-            var bracket = await _context.Brackets.FindAsync(id);
+            var bracket = await _context.Brackets
+                .Include(b => b.Teams)
+                .Include(b => b.Rounds)
+                    .ThenInclude(r => r.Matchups)
+                        .ThenInclude(m => m.Teams)
+                .FirstOrDefaultAsync(b => b.Id == id);
             if (bracket == null)
             {
                 return NotFound();

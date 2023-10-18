@@ -1,45 +1,41 @@
 ﻿@model CTFTournamentPlanner.Models.Bracket
 
-<p>Aantal teams: @Model.Teams.Count()</p>
-<p>Aantal rondes: @Model.Rounds.Count()</p>
-@foreach (Round round in Model.Rounds)
-{
-    <p>Deze ronde heeft @round.Matchups.Count() matchups</p>
-}
-
-
-
-@*
-<table>
-@foreach (Round round in Model.Rounds)
-{
-    <thead>@Html.DisplayFor(modelRound => round.Name)</thead>
-    round.Matchups = new List<Matchup>();
-    foreach (Matchup matchup in round.Matchups)
-    {
-        <tr>
-            <ul>
-            @if (matchup.Teams != null)
+<table class="table">
+    <tr>
+        @foreach (Round round in Model.Rounds)
+        {
+            <th>@Html.DisplayFor(modelRound => round.Name)</th>
+        }
+    </tr>
+    
+        @foreach (Round round in Model.Rounds)
+        {
+            <td>
+            @foreach (Matchup matchup in round.Matchups)
             {
-                matchup.Teams = new List<Team>();
-                foreach (Team team in matchup.Teams)
+                List<Team> teams = matchup.Teams.ToList();
+                if (teams.Count() == 2)
                 {
-                    <li>@team.Name</li>
+                    <div class="matchup-box">
+                        <table class="table">
+                            <tr><td class="matchup-team-box">@teams[0].Name</td><td class="matchup-team-box-score">@matchup.ScoreA</td></tr>
+                            <tr><td class="matchup-team-box">@teams[1].Name</td><td class="matchup-team-box-score">@matchup.ScoreB</td></tr>
+                        </table>
+                    </div>
                 }
                 
+                else
+                {
+                    <div class="matchup-box">
+                        <table class="table">                        
+                            <tr><td class="matchup-team-box">tbd.</td></tr>
+                            <tr><td class="matchup-team-box">tbd.</td></tr>
+                        </table>
+
+                    </div>                                        
+                }
             }
-            else
-            {
-                <li>
-                    tbd.  
-                </li>
-                <li>
-                    tbd.
-                </li>
-            }
-            </ul>
-        </tr>
-    }
-}
+            </td>
+        }
+    
 </table>
-*@

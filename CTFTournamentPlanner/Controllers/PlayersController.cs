@@ -20,15 +20,13 @@ namespace CTFTournamentPlanner.Controllers
         }
 
         [Authorize(Roles = "Administrators")]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var viewModel = new TeamIndexViewModel
-            {
-                Teams = _context.Teams.Include(t => t.Players).ToList(),
-                Players = _context.Users.Include(p => p.Team).ToList()
-            };
-            // return View(userManager.Users);
-            return View(viewModel);
+            var players = await _context.Users
+                .Include(p => p.Team)
+                .ToListAsync();
+
+            return View(players);
         }
         public async Task<IActionResult> Details(string? id)
         {

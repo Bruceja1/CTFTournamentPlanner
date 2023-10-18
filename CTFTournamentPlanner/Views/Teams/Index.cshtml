@@ -1,6 +1,7 @@
-﻿@* @model IEnumerable<CTFTournamentPlanner.Models.Team> *@
-@model TeamIndexViewModel
-
+﻿@* @model CTFTournamentPlanner.Models.Team *@
+@model IEnumerable<CTFTournamentPlanner.Models.Team>
+@*@model TeamIndexViewModel*@
+@*
 @{
     ViewData["Title"] = "Index";
 }
@@ -48,6 +49,67 @@
                         memberCount += 1;
                     }
                     <p>@memberCount</p>                   
+                </td>
+
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+*@
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Teamlijst</h1>
+
+<p>
+    <a class="btn btn-sm btn-primary" asp-action="Create">Nieuw Team Aanmaken</a>
+</p>
+@Html.ValidationSummary(true, "", new { @class = "text-danger"})
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Team
+            </th>
+            <th>
+                Teamleider
+            </th>
+            <th>
+                Aantal Teamleden
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @foreach (Player player in item.Players)
+                    {
+                        if (player.IsTeamLeader)
+                        {
+                            <p>@player.UserName</p>
+                        }
+                    }
+                </td>
+                <td>
+                    @{
+                        int memberCount = 0;
+                    }
+                    @foreach (Player player in item.Players)
+                    {
+                        memberCount += 1;
+                    }
+                    <p>@memberCount</p>
                 </td>
 
                 <td>

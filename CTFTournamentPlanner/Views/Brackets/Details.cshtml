@@ -4,15 +4,13 @@
     ViewData["Title"] = "Details";
 }
 
+<h1>@Model.Name</h1>
+
+<p>Aantal deelnemende teams: @Model.Teams.Count()</p>
+<h4>Bracket</h4>
+
 @if (Model.IsGenerated == false)
-{
-    <h1>@Model.Name</h1>
-
-
-    <h4>Bracket</h4>
-    <p>Aantal deelnemende teams:</p>
-    <p>@Model.Teams.Count()</p>
-
+{    
     <form method="post" asp-controller="Brackets" asp-action="GenerateBracket" asp-route-id="@Model.Id">
         <button type="submit" class="btn btn-primary">Bracket Genereren</button>
     </form>

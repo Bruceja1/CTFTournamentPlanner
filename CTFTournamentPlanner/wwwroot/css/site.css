@@ -32,3 +32,28 @@ body {
     font-weight: normal;
     font-style: normal;
 }
+
+.matchup-box {
+    border: 0px solid #ccc;   
+    background-color: #f9f9f9;
+    max-width: 300px;
+    margin-bottom: 20px;
+    margin-top: 20px;
+    align-items: center;
+}
+
+.matchup-team-box {
+    border: 1px solid #ccc;
+    padding: 5px;
+    margin: 5px;
+    background-color: #f9f9f9;
+    max-width: 200px;
+}
+
+.matchup-team-box-score {
+    border: 1px solid #ccc;
+    padding: 5px;
+    margin: 5px;
+    background-color: #f9f9f9;
+    max-width: 40px;
+}

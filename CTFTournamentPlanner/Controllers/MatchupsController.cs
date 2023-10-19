@@ -111,21 +111,44 @@ namespace CTFTournamentPlanner.Controllers
             if (ModelState.IsValid)
             {
                 try
-                {
-                    // Bestaande matchup ophalen.
+                {                   
+                    // Bestaande matchup ophalen (Met de oude data). Anders verschijnen er een heleboel nare errors...
                     var existingMatchup = await _context.Matchups
                         .Include(m => m.Teams)
                         .FirstOrDefaultAsync(m => m.Id == matchup.Id);
 
                     if (existingMatchup != null)
                     {
-                        var teamA = await _context.Teams.FindAsync(matchup.SelectedTeamAId);
-                        var teamB = await _context.Teams.FindAsync(matchup.SelectedTeamBId);
+                        
+                        if (matchup.SelectedTeamAId != null && matchup.SelectedTeamBId != null)
+                        {
+                            existingMatchup.Teams.Clear();
+                            var teamA = await _context.Teams.FindAsync(matchup.SelectedTeamAId);                          
+                            existingMatchup.Teams.Add(teamA);
 
-                        existingMatchup.Teams.Clear();
-                        existingMatchup.Teams.Add(teamA);
-                        existingMatchup.Teams.Add(teamB);
+                            var teamB = await _context.Teams.FindAsync(matchup.SelectedTeamBId);
+                            existingMatchup.Teams.Add(teamB);                          
+                        }
 
+                        else if (matchup.SelectedTeamAId == null && matchup.SelectedTeamBId != null)
+                        {
+                            existingMatchup.Teams.Clear();
+                            var teamB = await _context.Teams.FindAsync(matchup.SelectedTeamBId);
+                            existingMatchup.Teams.Add(teamB);
+                        }
+
+                        else if (matchup.SelectedTeamAId != null && matchup.SelectedTeamBId == null)
+                        {
+                            existingMatchup.Teams.Clear();
+                            var teamA = await _context.Teams.FindAsync(matchup.SelectedTeamAId);                                                     
+                            existingMatchup.Teams.Add(teamA);
+                        }
+
+                        else if (matchup.SelectedTeamAId == null && matchup.SelectedTeamBId == null)
+                        {
+                            existingMatchup.Teams.Clear();
+                        }
+                                            
                         existingMatchup.ScoreA = matchup.ScoreA;
                         existingMatchup.ScoreB = matchup.ScoreB;
 

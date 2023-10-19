@@ -4,10 +4,120 @@
     ViewData["Title"] = "Edit";
 }
 
-<h1>Edit</h1>
+<h1>Update Tussenstanden</h1>
 
 <h4>Bracket</h4>
 <hr />
+
+<table class="table">
+    <tr>
+        @foreach (Round round in Model.Rounds)
+        {
+            <th>@Html.DisplayFor(modelRound => round.Name)</th>
+        }
+    </tr>
+
+    @foreach (Round round in Model.Rounds)
+    {
+        <td>
+            @foreach (Matchup matchup in round.Matchups)
+            {
+                List<Team> teams = matchup.Teams.ToList();
+                if (teams.Count() == 2)
+                {
+                    <table>
+                        <tr>
+                            <td>
+                                <div class="matchup-box">
+                                    <table class="table">
+                                        <tr><td class="matchup-team-box">@teams[0].Name</td><td class="matchup-team-box-score">@matchup.ScoreA</td></tr>
+                                        <tr><td class="matchup-team-box">@teams[1].Name</td><td class="matchup-team-box-score">@matchup.ScoreB</td></tr>
+                                    </table>
+                                </div>
+                            </td>
+                            <td>
+                                <a asp-controller="Matchups" asp-action="Edit" asp-route-id="@matchup.Id">
+                                    <button type="submit" class="btn btn-primary">Update</button>
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
+                }
+
+                else if (teams.Count() == 1)
+                {
+                    if (teams[0].Id == matchup.SelectedTeamAId)
+                    {
+                        <table>
+                            <tr>
+                                <td>                                                                            
+                                    <div class="matchup-box">
+                                        <table class="table">
+                                            <tr><td class="matchup-team-box">@teams[0].Name</td><td class="matchup-team-box-score">@matchup.ScoreA</td></tr>
+                                            <tr><td class="matchup-team-box">tbd.</td><td class="matchup-team-box-score">@matchup.ScoreB</td></tr>
+                                        </table>
+                                    </div>
+                                </td>
+                                <td>
+                                    <a asp-controller="Matchups" asp-action="Edit" asp-route-id="@matchup.Id">
+                                        <button type="submit" class="btn btn-primary">Update</button>
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
+                    }
+                    else if (teams[0].Id == matchup.SelectedTeamBId)
+                    {
+                        <table>
+                            <tr>
+                                <td>                                                 
+                                    <div class="matchup-box">
+                                        <table class="table">
+                                            <tr><td class="matchup-team-box">tbd.</td><td class="matchup-team-box-score">@matchup.ScoreA</td></tr>
+                                            <tr><td class="matchup-team-box">@teams[0].Name</td><td class="matchup-team-box-score">@matchup.ScoreB</td></tr>
+                                        </table>
+                                    </div>                          
+                                </td>
+                                <td>
+                                    <a asp-controller="Matchups" asp-action="Edit" asp-route-id="@matchup.Id">
+                                        <button type="submit" class="btn btn-primary">Update</button>
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
+                    }
+
+                }
+
+                else
+                {
+                    <table>
+                        <tr>
+                            <td>                  
+                                <div class="matchup-box">
+                                    <table class="table">
+                                        <tr><td class="matchup-team-box">tbd.</td></tr>
+                                        <tr><td class="matchup-team-box">tbd.</td></tr>
+                                    </table>
+
+                                </div>
+                            </td>
+                            <td>
+                                <a asp-controller="Matchups" asp-action="Edit" asp-route-id="@matchup.Id">
+                                    <button type="submit" class="btn btn-primary">Update</button>
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
+                }
+            }
+        </td>
+    }
+
+</table>
+
+
+@*
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Edit">
@@ -103,14 +213,7 @@
 
     </table>
 }
-
-
-   
-
-
-
-
-
+*@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

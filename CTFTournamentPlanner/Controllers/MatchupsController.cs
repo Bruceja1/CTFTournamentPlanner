@@ -103,23 +103,25 @@ namespace CTFTournamentPlanner.Controllers
                 return NotFound();
             }
 
-            if (matchup.SelectedTeamAId == matchup.SelectedTeamBId)
+            if (matchup.SelectedTeamAId == matchup.SelectedTeamBId && matchup.SelectedTeamAId != null && matchup.SelectedTeamBId != null)
             {
                 ModelState.AddModelError("", "Een team mag niet twee keer voorkomen in een matchup.");
             }
 
             if (ModelState.IsValid)
             {
-                try
-                {                   
-                    // Bestaande matchup ophalen (Met de oude data). Anders verschijnen er een heleboel nare errors...
-                    var existingMatchup = await _context.Matchups
-                        .Include(m => m.Teams)
-                        .FirstOrDefaultAsync(m => m.Id == matchup.Id);
+                // Bestaande matchup ophalen (Met de oude data). Anders verschijnen er een heleboel nare errors...
+                var existingMatchup = await _context.Matchups
+                    .Include(m => m.Teams)
+                    .Include(m => m.Round)
+                        .ThenInclude(r => r.Bracket)
+                    .FirstOrDefaultAsync(m => m.Id == matchup.Id);
 
+                try
+                {                                     
                     if (existingMatchup != null)
                     {
-                        
+
                         if (matchup.SelectedTeamAId != null && matchup.SelectedTeamBId != null)
                         {
                             existingMatchup.Teams.Clear();
@@ -127,7 +129,7 @@ namespace CTFTournamentPlanner.Controllers
                             existingMatchup.Teams.Add(teamA);
 
                             var teamB = await _context.Teams.FindAsync(matchup.SelectedTeamBId);
-                            existingMatchup.Teams.Add(teamB);                          
+                            existingMatchup.Teams.Add(teamB);
                         }
 
                         else if (matchup.SelectedTeamAId == null && matchup.SelectedTeamBId != null)
@@ -171,7 +173,7 @@ namespace CTFTournamentPlanner.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Details", "Brackets", new { id = existingMatchup.Round.Bracket.Id });
             }
             ViewData["RoundId"] = new SelectList(_context.Rounds, "Id", "Id", matchup.RoundId);
             return View(matchup);

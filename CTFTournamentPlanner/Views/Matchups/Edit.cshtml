@@ -7,6 +7,7 @@
 <h1>Edit</h1>
 
 <h4>Matchup</h4>
+@*
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -34,7 +35,77 @@
         </form>
     </div>
 </div>
+*@
+<form asp-controller="Matchups" asp-action="Edit" method="post">
+@{List<Team>teams = Model.Teams.ToList();
+    if (teams.Count() == 2)
+    {
+    <div class="matchup-box">
+        <table class="table">
+            <tr>
+                <td class="matchup-team-box">
+                    <select name="selectedTeam1" class="form-control">
+                        <option value="@teams[0].Name">@teams[0].Name</option>                       
+                                    @foreach (var team in Model.Round.Bracket.Teams)
+                                    {
+                                        if (team.Name != teams[0].Name)
+                                        {
+                                            <option value="@team.Name">@team.Name</option>
+                                        }
+                                    }
+                    </select>                  
+                </td>
+                <td class="matchup-team-box-score-edit">                           
+                            <input asp-for="ScoreA" class="form-control" />
+                            <span asp-validation-for="ScoreA" class="text-danger"></span>
+                </td>
+            </tr>
+            <tr>
+                <td class="matchup-team-box">
+                   <select name="selectedTeam2" class="form-control">
+                        <option value="@teams[1].Name">@teams[1].Name</option>
+                                    @foreach (var team in Model.Round.Bracket.Teams)
+                                    {
+                                        if (team.Name != teams[1].Name)
+                                        {
+                                            <option value="@team.Name">@team.Name</option>
+                                        }
+                                    }
+                    </select>
+                </td>
+                <td class="matchup-team-box-score">
+                            <input asp-for="ScoreB" class="form-control" />
+                            <span asp-validation-for="ScoreB" class="text-danger"></span>
+                </td>
+            </tr>
+        </table>
+    </div>
+    }
 
+    else if (teams.Count() == 1)
+    {
+    <div class="matchup-box">
+        <table class="table">
+            <tr><td class="matchup-team-box">@teams[0].Name</td><td class="matchup-team-box-score">@Model.ScoreA</td></tr>
+            <tr><td class="matchup-team-box">tbd.</td><td class="matchup-team-box-score">@Model.ScoreB</td></tr>
+        </table>
+    </div>
+    }
+
+
+    else
+    {
+    <div class="matchup-box">
+        <table class="table">
+            <tr><td class="matchup-team-box">tbd.</td></tr>
+            <tr><td class="matchup-team-box">tbd.</td></tr>
+        </table>
+
+    </div>
+    }
+}
+    <button type="submit" class="btn btn-primary">Opslaan</button>
+</form>
 <div>
     <a asp-action="Index">Back to List</a>
 </div>

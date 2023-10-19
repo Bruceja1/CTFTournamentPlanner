@@ -23,7 +23,17 @@
                         </table>
                     </div>
                 }
-                
+
+                else if (teams.Count() == 1)
+                {
+                    <div class="matchup-box">
+                        <table class="table">
+                            <tr><td class="matchup-team-box">@teams[0].Name</td><td class="matchup-team-box-score">@matchup.ScoreA</td></tr>
+                            <tr><td class="matchup-team-box">tbd.</td><td class="matchup-team-box-score">@matchup.ScoreB</td></tr>
+                        </table>
+                    </div>
+                }
+
                 else
                 {
                     <div class="matchup-box">

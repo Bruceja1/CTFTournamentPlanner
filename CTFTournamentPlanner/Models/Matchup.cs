@@ -10,6 +10,7 @@ namespace CTFTournamentPlanner.Models
         [MaxLength(100)]
         public int? ScoreB { get; set;} = 0;
         public ICollection<Team>? Teams { get; set; }
+        public Round Round { get; set; }
         public int? RoundId { get; set; }
     }
 }

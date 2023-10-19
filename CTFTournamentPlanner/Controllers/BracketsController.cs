@@ -101,16 +101,18 @@ namespace CTFTournamentPlanner.Controllers
                 return NotFound();
             }
 
-            var bracket = await _context.Brackets
+            Bracket bracket = await _context.Brackets
                 .Include(b => b.Teams)
                 .Include(b => b.Rounds)
                     .ThenInclude(r => r.Matchups)
                         .ThenInclude(m => m.Teams)
                 .FirstOrDefaultAsync(b => b.Id == id);
+
             if (bracket == null)
             {
                 return NotFound();
             }
+
             return View(bracket);
         }
 
@@ -129,11 +131,31 @@ namespace CTFTournamentPlanner.Controllers
 
             if (ModelState.IsValid)
             {
+                /*
                 try
                 {
                     _context.Update(bracket);
                     await _context.SaveChangesAsync();
                 }
+                */
+
+                try
+                {
+                    var originalBracket = _context.Brackets.Find(bracket.Id);
+                    if (originalBracket == null)
+                    {
+                        return NotFound();
+                    }
+
+                    // Ophalen van de oorspronkelijke IsGenerated waarde.
+                    bracket.IsGenerated = originalBracket.IsGenerated;
+
+                    // Overige properties terugzetten zoals ze horen.
+                    _context.Entry(originalBracket).CurrentValues.SetValues(bracket);
+
+                    await _context.SaveChangesAsync();
+                }
+
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!BracketExists(bracket.Id))
@@ -145,7 +167,7 @@ namespace CTFTournamentPlanner.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Details", new { id = bracket.Id} );
             }
             return View(bracket);
         }
@@ -244,8 +266,6 @@ namespace CTFTournamentPlanner.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> GenerateBracket(int id)
         {
-            // Scenario waarin het aantal teams oneven is verwerken...
-
             Bracket bracket = await _context.Brackets
                 .Include(b => b.Teams)
                 .Include(b => b.Rounds)

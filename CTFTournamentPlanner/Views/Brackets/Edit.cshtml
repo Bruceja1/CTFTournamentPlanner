@@ -13,14 +13,18 @@
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
-            <div class="form-group">
+            <table>
+                <tr>
+            <th class="form-group">
                 <label asp-for="Name" class="control-label"></label>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
+            </th>
+            <th class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
+            </th>
+                </tr>
+            </table>
         </form>
     </div>
 </div>
@@ -28,6 +32,85 @@
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
+
+@if (Model.IsGenerated)
+{
+    <table class="table">
+        <tr>
+            @foreach (Round round in Model.Rounds)
+            {
+                <th>@Html.DisplayFor(modelRound => round.Name)</th>
+            }
+        </tr>
+
+        @foreach (Round round in Model.Rounds)
+        {
+            <td>
+                @foreach (Matchup matchup in round.Matchups)
+                {
+                    List<Team> teams = matchup.Teams.ToList();
+                    if (teams.Count() == 2)
+                    {
+                        <table>
+                            <tr>
+                                <td>
+                                    <div class="matchup-box">
+                                        <table class="table">
+                                            <tr>
+                                                <td class="matchup-team-box">@teams[0].Name</td>
+                                                <td class="matchup-team-box-score">@matchup.ScoreA</td>                           
+                                            </tr>
+                                            <tr>
+                                                <td class="matchup-team-box">@teams[1].Name</td>
+                                                <td class="matchup-team-box-score">@matchup.ScoreB</td>                                               
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </td>
+                                <td>
+                                    <a asp-controller="Matchups" asp-action="Edit" asp-route-id="@matchup.Id">
+                                        <button type="submit" class="btn btn-primary">Update</button>
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
+                    }
+
+                    else
+                    {
+                        <table>
+                            <tr>
+                                <td>
+                                    <div class="matchup-box">
+                                        <table class="table">
+                                            <tr><td class="matchup-team-box">tbd.</td></tr>
+                                            <tr><td class="matchup-team-box">tbd.</td></tr>
+                                        </table>
+
+                                    </div>
+                                </td>
+                                <td>
+                                    <a asp-controller="Matchups" asp-action="Edit" asp-route-id="@matchup.Id">
+                                        <button type="submit" class="btn btn-primary">Update</button>
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
+                    }
+                }
+            </td>
+        }
+
+    </table>
+}
+
+
+   
+
+
+
+
+
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

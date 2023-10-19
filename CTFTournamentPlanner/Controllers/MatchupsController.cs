@@ -27,7 +27,9 @@ namespace CTFTournamentPlanner.Controllers
                           Problem("Entity set 'ApplicationDbContext.Matchups'  is null.");
         }
 
+        // Matchup details zijn te zien in de bracket details.
         // GET: Matchups/Details/5
+        /*
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null || _context.Matchups == null)
@@ -44,16 +46,24 @@ namespace CTFTournamentPlanner.Controllers
 
             return View(matchup);
         }
+        */
 
+        // Matchups worden automatisch aangemaakt wanneer een bracket gegenereerd wordt.
         // GET: Matchups/Create
+        /*
         public IActionResult Create()
         {
             return View();
         }
+        */
+
+        // Matchups worden automatisch aangemaakt wanneer een bracket gegenereerd wordt.
 
         // POST: Matchups/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
+        /*
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,ScoreA,ScoreB,RoundId")] Matchup matchup)
@@ -67,6 +77,8 @@ namespace CTFTournamentPlanner.Controllers
             return View(matchup);
         }
 
+        */
+
         // GET: Matchups/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -75,20 +87,28 @@ namespace CTFTournamentPlanner.Controllers
                 return NotFound();
             }
 
-            var matchup = await _context.Matchups.FindAsync(id);
+            Matchup matchup = await _context.Matchups
+                .Include(m => m.Teams)
+                .Include(m => m.Round)
+                    .ThenInclude(r => r.Bracket)
+                        .ThenInclude(b => b.Teams)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
             if (matchup == null)
             {
                 return NotFound();
             }
             return View(matchup);
         }
+        
 
         // POST: Matchups/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+       
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,ScoreA,ScoreB,RoundId")] Matchup matchup)
+        public async Task<IActionResult> Edit(int id, int selectedTeam1, int selectedTeam2, [Bind("Id,ScoreA,ScoreB,RoundId")] Matchup matchup)
         {
             if (id != matchup.Id)
             {
@@ -99,6 +119,7 @@ namespace CTFTournamentPlanner.Controllers
             {
                 try
                 {
+                    
                     _context.Update(matchup);
                     await _context.SaveChangesAsync();
                 }
@@ -118,7 +139,10 @@ namespace CTFTournamentPlanner.Controllers
             return View(matchup);
         }
 
+        // Matchups worden verwijderd wanneer de bracket verwijderd wordt.
+
         // GET: Matchups/Delete/5
+        /*
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.Matchups == null)
@@ -154,10 +178,11 @@ namespace CTFTournamentPlanner.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-
+        */
         private bool MatchupExists(int id)
         {
           return (_context.Matchups?.Any(e => e.Id == id)).GetValueOrDefault();
         }
+        
     }
 }

@@ -4,10 +4,30 @@
     ViewData["Title"] = "Edit";
 }
 
+@{
+    List<Team> teams = Model.Teams.ToList();
+    Team teamA = new Team();
+    Team teamB = new Team();
+    foreach (Team team in teams)
+    {
+        if (team.Id == Model.SelectedTeamAId)
+        {
+            teamA = team;
+        }
+    }
+    foreach (Team team in teams)
+    {
+        if (team.Id == Model.SelectedTeamBId)
+        {
+            teamB = team;
+        }
+    }    
+}
+
+
 <h1>Edit</h1>
 
 <h4>Matchup</h4>
-@*
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -24,10 +44,38 @@
                 <input asp-for="ScoreB" class="form-control" />
                 <span asp-validation-for="ScoreB" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            
+            <div class="form-group" style="display:none">
                 <label asp-for="RoundId" class="control-label"></label>
                 <select asp-for="RoundId" class="form-control" asp-items="ViewBag.RoundId"></select>
                 <span asp-validation-for="RoundId" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group">
+                <label asp-for="SelectedTeamAId" class="control-label"></label>
+                <select asp-for="SelectedTeamAId" class="form-control">
+                    <option value="@teamA.Id">@teamA.Name</option>
+                    @foreach (Team team in Model.Round.Bracket.Teams)
+                    {
+                        
+                            <option value ="@team.Id">@team.Name</option>
+                        
+                    }
+                </select>
+                <span asp-validation-for="SelectedTeamAId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SelectedTeamBId" class="control-label"></label>
+                <select asp-for="SelectedTeamBId" class="form-control">
+                    <option value ="@teamB.Id">@teamB.Name</option>
+                    @foreach (Team team in Model.Round.Bracket.Teams)
+                    {
+                        
+                            <option value ="@team.Id">@team.Name</option>
+                        
+                    }
+                </select>
+                <span asp-validation-for="SelectedTeamBId" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
@@ -35,77 +83,7 @@
         </form>
     </div>
 </div>
-*@
-<form asp-controller="Matchups" asp-action="Edit" method="post">
-@{List<Team>teams = Model.Teams.ToList();
-    if (teams.Count() == 2)
-    {
-    <div class="matchup-box">
-        <table class="table">
-            <tr>
-                <td class="matchup-team-box">
-                    <select name="selectedTeam1" class="form-control">
-                        <option value="@teams[0].Name">@teams[0].Name</option>                       
-                                    @foreach (var team in Model.Round.Bracket.Teams)
-                                    {
-                                        if (team.Name != teams[0].Name)
-                                        {
-                                            <option value="@team.Name">@team.Name</option>
-                                        }
-                                    }
-                    </select>                  
-                </td>
-                <td class="matchup-team-box-score-edit">                           
-                            <input asp-for="ScoreA" class="form-control" />
-                            <span asp-validation-for="ScoreA" class="text-danger"></span>
-                </td>
-            </tr>
-            <tr>
-                <td class="matchup-team-box">
-                   <select name="selectedTeam2" class="form-control">
-                        <option value="@teams[1].Name">@teams[1].Name</option>
-                                    @foreach (var team in Model.Round.Bracket.Teams)
-                                    {
-                                        if (team.Name != teams[1].Name)
-                                        {
-                                            <option value="@team.Name">@team.Name</option>
-                                        }
-                                    }
-                    </select>
-                </td>
-                <td class="matchup-team-box-score">
-                            <input asp-for="ScoreB" class="form-control" />
-                            <span asp-validation-for="ScoreB" class="text-danger"></span>
-                </td>
-            </tr>
-        </table>
-    </div>
-    }
 
-    else if (teams.Count() == 1)
-    {
-    <div class="matchup-box">
-        <table class="table">
-            <tr><td class="matchup-team-box">@teams[0].Name</td><td class="matchup-team-box-score">@Model.ScoreA</td></tr>
-            <tr><td class="matchup-team-box">tbd.</td><td class="matchup-team-box-score">@Model.ScoreB</td></tr>
-        </table>
-    </div>
-    }
-
-
-    else
-    {
-    <div class="matchup-box">
-        <table class="table">
-            <tr><td class="matchup-team-box">tbd.</td></tr>
-            <tr><td class="matchup-team-box">tbd.</td></tr>
-        </table>
-
-    </div>
-    }
-}
-    <button type="submit" class="btn btn-primary">Opslaan</button>
-</form>
 <div>
     <a asp-action="Index">Back to List</a>
 </div>

@@ -224,8 +224,9 @@ namespace CTFTournamentPlanner.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // Aangezien het niet praktisch is om elk team individueel aan te moeten melden om deel te nemen aan een bracket, is deze
-        // functionaliteit voor deze inleveropdracht eruit gehaald.
+        // Aangezien het niet praktisch is om elk gegenereerd team individueel aan te moeten melden om deel te nemen aan een bracket,
+        // is deze functionaliteit voor deze inleveropdracht weggehaald. Als deze applicatie in productie gezet zou worden kan deze
+        // functie gebruikt worden.
         /*
         [Authorize]
         public async Task<IActionResult> SignUp(int id)
@@ -358,9 +359,13 @@ namespace CTFTournamentPlanner.Controllers
                     if (i == bracket.Teams.ToList().Count())
                     {
                         matchup.Teams.Add(teams[teams.Count() - 1]);
+                        matchup.SelectedTeamAId = teams[teams.Count() - 1].Id;
                         teams.RemoveAt(teams.Count() - 1);
+                      
                         matchup.Teams.Add(teams[teams.Count() - 1]);
+                        matchup.SelectedTeamBId = teams[teams.Count() - 1].Id;
                         teams.RemoveAt(teams.Count() - 1);
+                        
 
                     }
                     _context.Matchups.Add(matchup);

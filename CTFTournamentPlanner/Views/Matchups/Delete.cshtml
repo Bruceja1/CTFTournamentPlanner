@@ -23,6 +23,24 @@
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.ScoreB)
         </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Round)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Round.Id)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.SelectedTeamAId)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.SelectedTeamAId)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.SelectedTeamBId)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.SelectedTeamBId)
+        </dd>
     </dl>
     
     <form asp-action="Delete">

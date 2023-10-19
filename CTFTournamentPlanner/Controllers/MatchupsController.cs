@@ -22,14 +22,11 @@ namespace CTFTournamentPlanner.Controllers
         // GET: Matchups
         public async Task<IActionResult> Index()
         {
-              return _context.Matchups != null ? 
-                          View(await _context.Matchups.ToListAsync()) :
-                          Problem("Entity set 'ApplicationDbContext.Matchups'  is null.");
+            var applicationDbContext = _context.Matchups.Include(m => m.Round);
+            return View(await applicationDbContext.ToListAsync());
         }
 
-        // Matchup details zijn te zien in de bracket details.
         // GET: Matchups/Details/5
-        /*
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null || _context.Matchups == null)
@@ -38,6 +35,7 @@ namespace CTFTournamentPlanner.Controllers
             }
 
             var matchup = await _context.Matchups
+                .Include(m => m.Round)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (matchup == null)
             {
@@ -46,27 +44,20 @@ namespace CTFTournamentPlanner.Controllers
 
             return View(matchup);
         }
-        */
 
-        // Matchups worden automatisch aangemaakt wanneer een bracket gegenereerd wordt.
         // GET: Matchups/Create
-        /*
         public IActionResult Create()
         {
+            ViewData["RoundId"] = new SelectList(_context.Rounds, "Id", "Id");
             return View();
         }
-        */
-
-        // Matchups worden automatisch aangemaakt wanneer een bracket gegenereerd wordt.
 
         // POST: Matchups/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-
-        /*
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,ScoreA,ScoreB,RoundId")] Matchup matchup)
+        public async Task<IActionResult> Create([Bind("Id,ScoreA,ScoreB,RoundId,SelectedTeamAId,SelectedTeamBId")] Matchup matchup)
         {
             if (ModelState.IsValid)
             {
@@ -74,10 +65,9 @@ namespace CTFTournamentPlanner.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["RoundId"] = new SelectList(_context.Rounds, "Id", "Id", matchup.RoundId);
             return View(matchup);
         }
-
-        */
 
         // GET: Matchups/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -87,42 +77,66 @@ namespace CTFTournamentPlanner.Controllers
                 return NotFound();
             }
 
-            Matchup matchup = await _context.Matchups
+            var matchup = await _context.Matchups
                 .Include(m => m.Teams)
                 .Include(m => m.Round)
                     .ThenInclude(r => r.Bracket)
                         .ThenInclude(b => b.Teams)
                 .FirstOrDefaultAsync(m => m.Id == id);
-
             if (matchup == null)
             {
                 return NotFound();
             }
+            ViewData["RoundId"] = new SelectList(_context.Rounds, "Id", "Id", matchup.RoundId);
             return View(matchup);
         }
-        
 
         // POST: Matchups/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-       
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, int selectedTeam1, int selectedTeam2, [Bind("Id,ScoreA,ScoreB,RoundId")] Matchup matchup)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,ScoreA,ScoreB,RoundId,SelectedTeamAId,SelectedTeamBId")] Matchup matchup)
         {
             if (id != matchup.Id)
             {
                 return NotFound();
             }
 
+            if (matchup.SelectedTeamAId == matchup.SelectedTeamBId)
+            {
+                ModelState.AddModelError("", "Een team mag niet twee keer voorkomen in een matchup.");
+            }
+
             if (ModelState.IsValid)
             {
                 try
                 {
-                    
-                    _context.Update(matchup);
-                    await _context.SaveChangesAsync();
+                    // Bestaande matchup ophalen.
+                    var existingMatchup = await _context.Matchups
+                        .Include(m => m.Teams)
+                        .FirstOrDefaultAsync(m => m.Id == matchup.Id);
+
+                    if (existingMatchup != null)
+                    {
+                        var teamA = await _context.Teams.FindAsync(matchup.SelectedTeamAId);
+                        var teamB = await _context.Teams.FindAsync(matchup.SelectedTeamBId);
+
+                        existingMatchup.Teams.Clear();
+                        existingMatchup.Teams.Add(teamA);
+                        existingMatchup.Teams.Add(teamB);
+
+                        existingMatchup.ScoreA = matchup.ScoreA;
+                        existingMatchup.ScoreB = matchup.ScoreB;
+
+                        existingMatchup.SelectedTeamAId = matchup.SelectedTeamAId;
+                        existingMatchup.SelectedTeamBId = matchup.SelectedTeamBId;
+
+                        _context.Update(existingMatchup);
+                        await _context.SaveChangesAsync();
+                    }                                   
                 }
+
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!MatchupExists(matchup.Id))
@@ -136,13 +150,11 @@ namespace CTFTournamentPlanner.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["RoundId"] = new SelectList(_context.Rounds, "Id", "Id", matchup.RoundId);
             return View(matchup);
         }
 
-        // Matchups worden verwijderd wanneer de bracket verwijderd wordt.
-
         // GET: Matchups/Delete/5
-        /*
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.Matchups == null)
@@ -151,6 +163,7 @@ namespace CTFTournamentPlanner.Controllers
             }
 
             var matchup = await _context.Matchups
+                .Include(m => m.Round)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (matchup == null)
             {
@@ -178,11 +191,10 @@ namespace CTFTournamentPlanner.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-        */
+
         private bool MatchupExists(int id)
         {
           return (_context.Matchups?.Any(e => e.Id == id)).GetValueOrDefault();
         }
-        
     }
 }

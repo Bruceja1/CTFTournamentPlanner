@@ -1,76 +1,16 @@
-﻿@* @model CTFTournamentPlanner.Models.Team *@
-@model IEnumerable<CTFTournamentPlanner.Models.Team>
-@*@model TeamIndexViewModel*@
-@*
+﻿@model IEnumerable<CTFTournamentPlanner.Models.Team>
+
 @{
     ViewData["Title"] = "Index";
 }
 
 <h1>Teamlijst</h1>
 
-<p>
-    <a class="btn btn-sm btn-primary" asp-action="Create">Nieuw Team Aanmaken</a>
-</p>
-@Html.ValidationSummary(true, "", new { @class = "text-danger"})
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Teams)
-            </th>
-            <th>
-                Teamleider
-            </th>
-            <th>
-                Aantal Teamleden
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.Teams)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name)
-                </td>
-                <td>
-                    @foreach (Player player in item.Players)
-                    {
-                        if (player.IsTeamLeader)
-                        {
-                            <p>@player.UserName</p>
-                        }
-                    }
-                </td>
-                <td>
-                    @{int memberCount = 0;}
-                    @foreach (Player player in item.Players)
-                    {
-                        memberCount += 1;
-                    }
-                    <p>@memberCount</p>                   
-                </td>
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<form asp-controller="Teams" asp-action="Create">
+    <button type="submit" class="btn btn-primary">Nieuw Team</button>
+</form>
 
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-*@
-@{
-    ViewData["Title"] = "Index";
-}
-
-<h1>Teamlijst</h1>
-
-<p>
-    <a class="btn btn-sm btn-primary" asp-action="Create">Nieuw Team Aanmaken</a>
-</p>
-@Html.ValidationSummary(true, "", new { @class = "text-danger"})
 <table class="table">
     <thead>
         <tr>
@@ -113,9 +53,9 @@
                 </td>
 
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    <form method="get" asp-controller="Teams" asp-action="Details" asp-route-id="@item.Id">
+                        <button type="submit" class="btn btn-info">Teamprofiel</button>
+                    </form>
                 </td>
             </tr>
         }

@@ -25,23 +25,28 @@
                 List<Team> teams = matchup.Teams.ToList();
                 if (teams.Count() == 2)
                 {
-                    <table>
-                        <tr>
-                            <td>
-                                <div class="matchup-box">
-                                    <table class="table">
-                                        <tr><td class="matchup-team-box">@teams[0].Name</td><td class="matchup-team-box-score">@matchup.ScoreA</td></tr>
-                                        <tr><td class="matchup-team-box">@teams[1].Name</td><td class="matchup-team-box-score">@matchup.ScoreB</td></tr>
-                                    </table>
-                                </div>
-                            </td>
-                            <td>
-                                <a asp-controller="Matchups" asp-action="Edit" asp-route-id="@matchup.Id">
-                                    <button type="submit" class="btn btn-primary">Update</button>
-                                </a>
-                            </td>
-                        </tr>
-                    </table>
+                    {
+                        Team teamA = teams[1];
+                        Team teamB = teams[0];
+
+                        <table>
+                            <tr>
+                                <td>
+                                    <div class="matchup-box">
+                                        <table class="table">
+                                            <tr><td class="matchup-team-box">@teamA.Name</td><td class="matchup-team-box-score">@matchup.ScoreA</td></tr>
+                                            <tr><td class="matchup-team-box">@teamB.Name</td><td class="matchup-team-box-score">@matchup.ScoreB</td></tr>
+                                        </table>
+                                    </div>
+                                </td>
+                                <td>
+                                    <a asp-controller="Matchups" asp-action="Edit" asp-route-id="@matchup.Id">
+                                        <button type="submit" class="btn btn-primary">Update</button>
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
+                    }
                 }
 
                 else if (teams.Count() == 1)
@@ -114,6 +119,24 @@
         </td>
     }
 
+</table>
+
+<table>
+    <tr>
+        <td class="table">
+            <a asp-action="Details" asp-route-id="@Model?.Id">Terug naar lijst</a>
+        </td>
+        <td>
+            <a asp-controller="Brackets" asp-action="ArchiveBracket" asp-route-id="@Model?.Id">
+                <button type="submit" class="btn btn-primary" style="margin-right: 50px; width: 200px;">Markeren als voltooid</button>
+            </a>
+        </td>
+        <td>
+            <a asp-controller="Brackets" asp-action="Delete" asp-route-id="@Model?.Id">
+                <button type="submit" class="btn btn-primary">Verwijderen</button>
+            </a>
+        </td>
+    </tr>
 </table>
 
 @section Scripts {

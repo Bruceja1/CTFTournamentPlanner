@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CTFTournamentPlanner.Data;
 using CTFTournamentPlanner.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CTFTournamentPlanner.Controllers
 {
@@ -19,6 +20,7 @@ namespace CTFTournamentPlanner.Controllers
             _context = context;
         }
 
+        [Authorize (Roles = "Administrators")]
         // GET: Matchups
         public async Task<IActionResult> Index()
         {
@@ -26,6 +28,7 @@ namespace CTFTournamentPlanner.Controllers
             return View(await applicationDbContext.ToListAsync());
         }
 
+        [Authorize(Roles = "Administrators")]
         // GET: Matchups/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -45,6 +48,7 @@ namespace CTFTournamentPlanner.Controllers
             return View(matchup);
         }
 
+        [Authorize(Roles = "Administrators")]
         // GET: Matchups/Create
         public IActionResult Create()
         {
@@ -55,6 +59,7 @@ namespace CTFTournamentPlanner.Controllers
         // POST: Matchups/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Administrators")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,ScoreA,ScoreB,RoundId,SelectedTeamAId,SelectedTeamBId")] Matchup matchup)
@@ -69,6 +74,7 @@ namespace CTFTournamentPlanner.Controllers
             return View(matchup);
         }
 
+        [Authorize(Roles = "Administrators")]
         // GET: Matchups/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -94,6 +100,7 @@ namespace CTFTournamentPlanner.Controllers
         // POST: Matchups/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Administrators")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,ScoreA,ScoreB,RoundId,SelectedTeamAId,SelectedTeamBId")] Matchup matchup)
@@ -157,7 +164,7 @@ namespace CTFTournamentPlanner.Controllers
                         existingMatchup.SelectedTeamAId = matchup.SelectedTeamAId;
                         existingMatchup.SelectedTeamBId = matchup.SelectedTeamBId;
 
-                        _context.Update(existingMatchup);
+                        // _context.Update(existingMatchup);
                         await _context.SaveChangesAsync();
                     }                                   
                 }
@@ -179,6 +186,7 @@ namespace CTFTournamentPlanner.Controllers
             return View(matchup);
         }
 
+        [Authorize(Roles = "Administrators")]
         // GET: Matchups/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
@@ -199,6 +207,7 @@ namespace CTFTournamentPlanner.Controllers
         }
 
         // POST: Matchups/Delete/5
+        [Authorize(Roles = "Administrators")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

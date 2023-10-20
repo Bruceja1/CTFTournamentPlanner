@@ -381,12 +381,23 @@ namespace CTFTournamentPlanner.Controllers
 
         }
 
+        // Dit is om de status van de bracket aan te passen. Deze verschijnt als 'Actief' of 'Voltooid' op het bracketsoverzicht scherm.
+        [Authorize (Roles = "Administrators")]
         public async Task<IActionResult> ArchiveBracket(int id)
         {
             Bracket bracket = await _context.Brackets
                 .FirstOrDefaultAsync(b => b.Id == id);
+
+            if (bracket.IsActive)
+            {
+                bracket.IsActive = false;
+            }
+
+            else
+            {
+                bracket.IsActive = true;
+            }
  
-            _context.Update(bracket.IsActive == false);
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));

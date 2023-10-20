@@ -4,30 +4,178 @@
     ViewData["Title"] = "Edit";
 }
 
-<h1>Edit</h1>
+<h1>Update Tussenstanden</h1>
 
 <h4>Bracket</h4>
 <hr />
+
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
+            <table>
+                <tr>
+                    <td>
+                        <div class="form-group">
+                            <label asp-for="Name" class="control-label">Naam</label>
+                            <input asp-for="Name" class="form-control" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-group">
+                            <input type="submit" value="Opslaan" class="btn btn-primary" />
+                        </div>
+                    </td>
+                </tr>
+            </table>                     
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+<table class="table">
+    <tr>
+        @foreach (Round round in Model.Rounds)
+        {
+            <th>@Html.DisplayFor(modelRound => round.Name)</th>
+        }
+    </tr>
+
+    @foreach (Round round in Model.Rounds)
+    {
+        <td>
+            @foreach (Matchup matchup in round.Matchups)
+            {
+                List<Team> teams = matchup.Teams.ToList();
+                if (teams.Count() == 2)
+                {
+                    {
+                        Team teamA = teams[1];
+                        Team teamB = teams[0];
+
+                        foreach (Team team in teams)
+                        {
+                            if (team.Id == matchup.SelectedTeamAId)
+                            {
+                                teamA = team;
+                            }
+
+                            if (team.Id == matchup.SelectedTeamBId)
+                            {
+                                teamB = team;
+                            }
+                        }
+
+                        <table>
+                            <tr>
+                                <td>
+                                    <div class="matchup-box">
+                                        <table class="table">
+                                            <tr><td class="matchup-team-box">@teamA.Name</td><td class="matchup-team-box-score">@matchup.ScoreA</td></tr>
+                                            <tr><td class="matchup-team-box">@teamB.Name</td><td class="matchup-team-box-score">@matchup.ScoreB</td></tr>
+                                        </table>
+                                    </div>
+                                </td>
+                                <td>
+                                    <a asp-controller="Matchups" asp-action="Edit" asp-route-id="@matchup.Id">
+                                        <button type="submit" class="btn btn-primary">Update</button>
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
+                    }
+                }
+
+                else if (teams.Count() == 1)
+                {
+                    if (teams[0].Id == matchup.SelectedTeamAId)
+                    {
+                        <table>
+                            <tr>
+                                <td>                                                                            
+                                    <div class="matchup-box">
+                                        <table class="table">
+                                            <tr><td class="matchup-team-box">@teams[0].Name</td><td class="matchup-team-box-score">@matchup.ScoreA</td></tr>
+                                            <tr><td class="matchup-team-box">tbd.</td><td class="matchup-team-box-score">@matchup.ScoreB</td></tr>
+                                        </table>
+                                    </div>
+                                </td>
+                                <td>
+                                    <a asp-controller="Matchups" asp-action="Edit" asp-route-id="@matchup.Id">
+                                        <button type="submit" class="btn btn-primary">Update</button>
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
+                    }
+                    else if (teams[0].Id == matchup.SelectedTeamBId)
+                    {
+                        <table>
+                            <tr>
+                                <td>                                                 
+                                    <div class="matchup-box">
+                                        <table class="table">
+                                            <tr><td class="matchup-team-box">tbd.</td><td class="matchup-team-box-score">@matchup.ScoreA</td></tr>
+                                            <tr><td class="matchup-team-box">@teams[0].Name</td><td class="matchup-team-box-score">@matchup.ScoreB</td></tr>
+                                        </table>
+                                    </div>                          
+                                </td>
+                                <td>
+                                    <a asp-controller="Matchups" asp-action="Edit" asp-route-id="@matchup.Id">
+                                        <button type="submit" class="btn btn-primary">Update</button>
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
+                    }
+
+                }
+
+                else
+                {
+                    <table>
+                        <tr>
+                            <td>                  
+                                <div class="matchup-box">
+                                    <table class="table">
+                                        <tr><td class="matchup-team-box">tbd.</td></tr>
+                                        <tr><td class="matchup-team-box">tbd.</td></tr>
+                                    </table>
+
+                                </div>
+                            </td>
+                            <td>
+                                <a asp-controller="Matchups" asp-action="Edit" asp-route-id="@matchup.Id">
+                                    <button type="submit" class="btn btn-primary">Update</button>
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
+                }
+            }
+        </td>
+    }
+
+</table>
+
+<table>
+    <tr>
+        <td class="table">
+            <a asp-action="Details" asp-route-id="@Model?.Id">Terug naar bracket</a>
+        </td>
+        <td>
+            <a asp-controller="Brackets" asp-action="ArchiveBracket" asp-route-id="@Model?.Id">
+                <button type="submit" class="btn btn-primary" style="margin-right: 50px; width: 200px;">Toernament markeren als voltooid</button>
+            </a>
+        </td>
+        <td>
+            <a asp-controller="Brackets" asp-action="Delete" asp-route-id="@Model?.Id">
+                <button type="submit" class="btn btn-primary">Toernament Verwijderen</button>
+            </a>
+        </td>
+    </tr>
+</table>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

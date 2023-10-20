@@ -13,17 +13,58 @@
             <td>
             @foreach (Matchup matchup in round.Matchups)
             {
-                List<Team> teams = matchup.Teams.ToList();
+                List<Team> teams = matchup.Teams.ToList();   
                 if (teams.Count() == 2)
                 {
-                    <div class="matchup-box">
-                        <table class="table">
-                            <tr><td class="matchup-team-box">@teams[0].Name</td><td class="matchup-team-box-score">@matchup.ScoreA</td></tr>
-                            <tr><td class="matchup-team-box">@teams[1].Name</td><td class="matchup-team-box-score">@matchup.ScoreB</td></tr>
-                        </table>
-                    </div>
+                    {
+                        Team teamA = teams[1];
+                        Team teamB = teams[0];
+
+                        foreach (Team team in teams)
+                        {
+                            if (team.Id == matchup.SelectedTeamAId)
+                            {
+                                teamA = team;
+                            }
+
+                            if (team.Id == matchup.SelectedTeamBId)
+                            {
+                                teamB = team;
+                            }
+                        }
+
+                        <div class="matchup-box">
+                            <table class="table">
+                                <tr><td class="matchup-team-box">@teamA.Name</td><td class="matchup-team-box-score">@matchup.ScoreA</td></tr>
+                                <tr><td class="matchup-team-box">@teamB.Name</td><td class="matchup-team-box-score">@matchup.ScoreB</td></tr>
+                            </table>
+                        </div>
+                    }
                 }
-                
+
+                else if (teams.Count() == 1)
+                {
+                    if (teams[0].Id == matchup.SelectedTeamAId)
+                    {
+                        <div class="matchup-box">
+                            <table class="table">
+                                <tr><td class="matchup-team-box">@teams[0].Name</td><td class="matchup-team-box-score">@matchup.ScoreA</td></tr>
+                                <tr><td class="matchup-team-box">tbd.</td><td class="matchup-team-box-score">@matchup.ScoreB</td></tr>
+                            </table>
+                        </div>
+                    }
+                    else if (teams[0].Id == matchup.SelectedTeamBId)
+                    {
+                        <div class="matchup-box">
+                            <table class="table">
+                                <tr><td class="matchup-team-box">tbd.</td><td class="matchup-team-box-score">@matchup.ScoreA</td></tr>
+                                <tr><td class="matchup-team-box">@teams[0].Name</td><td class="matchup-team-box-score">@matchup.ScoreB</td></tr>
+                            </table>
+                        </div>
+                    }
+
+                }
+
                 else
                 {
                     <div class="matchup-box">

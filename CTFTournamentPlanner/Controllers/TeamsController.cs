@@ -118,6 +118,10 @@ namespace CTFTournamentPlanner.Controllers
         // GET: Teams/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            Team existingTeam = await _context.Teams
+                .Include(t => t.Players)
+                .FirstOrDefaultAsync(t => t.Id == id);
+
             if (id == null || _context.Teams == null)
             {
                 return NotFound();
@@ -135,6 +139,11 @@ namespace CTFTournamentPlanner.Controllers
                 ModelState.AddModelError("", "Alleen de teamleider van dit team mag teamgegevens aanpassen.");
             }
 
+            if(!ModelState.IsValid)
+            {
+                return View("Details", existingTeam);
+            }
+
             return View(team);
         }
 
@@ -146,6 +155,10 @@ namespace CTFTournamentPlanner.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description")] Team team)
         {
+            Team existingTeam = await _context.Teams
+                .Include(t => t.Players)
+                .FirstOrDefaultAsync(t => t.Id == id);
+
             if (id != team.Id)
             {
                 return NotFound();
@@ -178,7 +191,7 @@ namespace CTFTournamentPlanner.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(team);
+            return View("Details", existingTeam);
         }
 
 
@@ -247,7 +260,9 @@ namespace CTFTournamentPlanner.Controllers
         [HttpPost]
         public async Task<IActionResult> JoinTeam(int id)
         {
-            Team team = await _context.Teams.FirstOrDefaultAsync(m => m.Id == id);
+            Team team = await _context.Teams
+                .Include(t => t.Players)
+                .FirstOrDefaultAsync(m => m.Id == id);
             Player currentUser = await userManager.GetUserAsync(User);
 
             if (team == null | currentUser == null)
@@ -267,7 +282,7 @@ namespace CTFTournamentPlanner.Controllers
 
             if (!ModelState.IsValid)
             {
-                return RedirectToAction("Details", team);
+                return View("Details", team);
             }
 
             currentUser.TeamId = team.Id;
@@ -280,7 +295,9 @@ namespace CTFTournamentPlanner.Controllers
         [HttpPost]
         public async Task<IActionResult> LeaveTeam(int id)
         {
-            Team team = await _context.Teams.FirstOrDefaultAsync(m => m.Id == id);
+            Team team = await _context.Teams
+                .Include(t => t.Players)
+                .FirstOrDefaultAsync(m => m.Id == id);
             Player currentUser = await userManager.GetUserAsync(User);
 
             if (team == null | currentUser == null)
@@ -300,7 +317,7 @@ namespace CTFTournamentPlanner.Controllers
 
             if (!ModelState.IsValid)
             {
-                return RedirectToAction("Details", team);
+                return View("Details", team);
             }
 
             currentUser.TeamId = null;

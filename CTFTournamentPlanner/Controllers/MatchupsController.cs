@@ -110,6 +110,7 @@ namespace CTFTournamentPlanner.Controllers
                 .Include(m => m.Teams)
                 .Include(m => m.Round)
                     .ThenInclude(r => r.Bracket)
+                        .ThenInclude(b => b.Teams)
                 .FirstOrDefaultAsync(m => m.Id == matchup.Id);
 
             if (id != matchup.Id)

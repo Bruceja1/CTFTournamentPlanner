@@ -7,15 +7,27 @@
 <h1>@Html.DisplayFor(model => model.Name)</h1>
 <h3 class="mt-5">Beschrijving</h3>
 <p>@Html.DisplayFor(model => model.Description)</p>
-<p>@Html.ValidationSummary(false)</p>
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-<form method="post" asp-controller="Teams" asp-action="JoinTeam" asp-route-id="@Model.Id">
-    <button type="submit" class="btn btn-primary">Join Team</button>
-</form>
-
-<form method="post" asp-controller="Teams" asp-action="LeaveTeam" asp-route-id="@Model.Id">
-    <button type="submit" class="btn btn-primary">Leave Team</button>
-</form>
+<table>
+    <tr>
+        <td>
+            <form method="post" asp-controller="Teams" asp-action="JoinTeam" asp-route-id="@Model.Id">
+                <button type="submit" class="btn btn-primary">Join Team</button>
+            </form>
+        </td>
+        <td>
+            <form method="post" asp-controller="Teams" asp-action="LeaveTeam" asp-route-id="@Model.Id">
+                <button type="submit" class="btn btn-primary">Team Verlaten</button>
+            </form>
+        </td>
+        <td>
+            <form method="post" asp-controller="Teams" asp-action="Delete" asp-route-id="@Model.Id">
+                <button type="submit" class="btn btn-primary">Team Verwijderen</button>
+            </form>
+        </td>
+    </tr>
+</table>
 
 <table class="table">
     <thead>

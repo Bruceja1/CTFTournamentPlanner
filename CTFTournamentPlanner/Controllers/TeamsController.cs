@@ -247,7 +247,9 @@ namespace CTFTournamentPlanner.Controllers
         [HttpPost]
         public async Task<IActionResult> JoinTeam(int id)
         {
-            Team team = await _context.Teams.FirstOrDefaultAsync(m => m.Id == id);
+            Team team = await _context.Teams
+                .Include(t => t.Players)
+                .FirstOrDefaultAsync(m => m.Id == id);
             Player currentUser = await userManager.GetUserAsync(User);
 
             if (team == null | currentUser == null)
@@ -267,7 +269,7 @@ namespace CTFTournamentPlanner.Controllers
 
             if (!ModelState.IsValid)
             {
-                return RedirectToAction("Details", team);
+                return View("Details", team);
             }
 
             currentUser.TeamId = team.Id;
@@ -280,7 +282,9 @@ namespace CTFTournamentPlanner.Controllers
         [HttpPost]
         public async Task<IActionResult> LeaveTeam(int id)
         {
-            Team team = await _context.Teams.FirstOrDefaultAsync(m => m.Id == id);
+            Team team = await _context.Teams
+                .Include(t => t.Players)
+                .FirstOrDefaultAsync(m => m.Id == id);
             Player currentUser = await userManager.GetUserAsync(User);
 
             if (team == null | currentUser == null)
@@ -300,7 +304,7 @@ namespace CTFTournamentPlanner.Controllers
 
             if (!ModelState.IsValid)
             {
-                return RedirectToAction("Details", team);
+                return View("Details", team);
             }
 
             currentUser.TeamId = null;

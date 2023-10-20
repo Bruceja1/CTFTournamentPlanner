@@ -1,19 +1,18 @@
-﻿@model TeamIndexViewModel
-@* @model IEnumerable<Player> *@
+﻿@model IEnumerable<CTFTournamentPlanner.Models.Player>
 @{
     ViewData["Title"] = "Registered Players";
 }
 
 <h1>Geregistreerde gebruikers</h1>
-<table>
+<table class="table">
     <tr><th>ID</th><th>Name</th><th>Email</th><th>Team</th></tr>
-    @foreach (Player p in Model.Players)
+    @foreach (Player p in Model)
     {
         <tr>
             <td>@p.Id</td>
             <td>@p.UserName</td>
             <td>@p.Email</td>
-            <td>@p.Team.Name</td>
+            <td>@(p.Team?.Name ?? "Geen team")</td>
             <td>
                 <a class="btn btn-sm btn-primary" asp-action="Edit" asp-route-id="@p.Id">
                     Wijzigen

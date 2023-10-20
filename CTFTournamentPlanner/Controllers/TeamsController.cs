@@ -27,18 +27,16 @@ namespace CTFTournamentPlanner.Controllers
         // GET: Teams      
         public async Task<IActionResult> Index()
         {
-            var viewModel = new TeamIndexViewModel
-            {
-                Teams = _context.Teams.Include(t => t.Players).ToList(),
-                Players = _context.Users.ToList()
-            };
+            var teams = await _context.Teams
+                .Include(t => t.Players)
+                .ToListAsync();
 
             if (_context.Teams == null)
             {
                 return Problem("Entity set 'ApplicationDbContext.Teams'  is null.");
             }
 
-            return View(viewModel);           
+            return View(teams);
         }
 
         // GET: Teams/Details/5
@@ -238,6 +236,7 @@ namespace CTFTournamentPlanner.Controllers
             else
             {
                 _context.Teams.Remove(team);
+                currentUser.IsTeamLeader = false;
                 await _context.SaveChangesAsync();
             }
                                  
@@ -249,8 +248,12 @@ namespace CTFTournamentPlanner.Controllers
         public async Task<IActionResult> JoinTeam(int id)
         {
             Team team = await _context.Teams.FirstOrDefaultAsync(m => m.Id == id);
-
             Player currentUser = await userManager.GetUserAsync(User);
+
+            if (team == null | currentUser == null)
+            {
+                return NotFound();
+            }
 
             if (currentUser.TeamId == team.Id)
             {
@@ -270,6 +273,39 @@ namespace CTFTournamentPlanner.Controllers
             currentUser.TeamId = team.Id;
             await _context.SaveChangesAsync();
 
+            return RedirectToAction("Details", team);
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> LeaveTeam(int id)
+        {
+            Team team = await _context.Teams.FirstOrDefaultAsync(m => m.Id == id);
+            Player currentUser = await userManager.GetUserAsync(User);
+
+            if (team == null | currentUser == null)
+            {
+                return NotFound();
+            }
+
+            if (currentUser.TeamId != team.Id | currentUser.TeamId == null)
+            {
+                ModelState.AddModelError("", "Je zit niet in dit team.");
+            }
+
+            if (currentUser.TeamId == team.Id && currentUser.IsTeamLeader == true)
+            {
+                return View("Delete", team);
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return RedirectToAction("Details", team);
+            }
+
+            currentUser.TeamId = null;
+
+            await _context.SaveChangesAsync();
             return RedirectToAction("Details", team);
         }
 

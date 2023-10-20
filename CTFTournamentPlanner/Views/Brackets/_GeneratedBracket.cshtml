@@ -1,5 +1,41 @@
 ﻿@model CTFTournamentPlanner.Models.Bracket
-@if(Model.Rounds.Count() != null)
-    {
-        <p>@Model.Rounds.Count()</p>
-    }
+
+<table class="table">
+    <tr>
+        @foreach (Round round in Model.Rounds)
+        {
+            <th>@Html.DisplayFor(modelRound => round.Name)</th>
+        }
+    </tr>
+    
+        @foreach (Round round in Model.Rounds)
+        {
+            <td>
+            @foreach (Matchup matchup in round.Matchups)
+            {
+                List<Team> teams = matchup.Teams.ToList();
+                if (teams.Count() == 2)
+                {
+                    <div class="matchup-box">
+                        <table class="table">
+                            <tr><td class="matchup-team-box">@teams[0].Name</td><td class="matchup-team-box-score">@matchup.ScoreA</td></tr>
+                            <tr><td class="matchup-team-box">@teams[1].Name</td><td class="matchup-team-box-score">@matchup.ScoreB</td></tr>
+                        </table>
+                    </div>
+                }
+                
+                else
+                {
+                    <div class="matchup-box">
+                        <table class="table">                        
+                            <tr><td class="matchup-team-box">tbd.</td></tr>
+                            <tr><td class="matchup-team-box">tbd.</td></tr>
+                        </table>
+
+                    </div>                                        
+                }
+            }
+            </td>
+        }
+    
+</table>

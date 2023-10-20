@@ -4,38 +4,24 @@
     ViewData["Title"] = "Details";
 }
 
-<h1>Details</h1>
+<h1>@Model.Name</h1>
 
-<div>
-    <h4>Bracket</h4>
-    <hr />
+<p>Aantal deelnemende teams: @Model.Teams.Count()</p>
+<h4>Bracket</h4>
 
-    @foreach (Team team in Model.Teams)
-    {
-        <p>@team.Name</p>
-    }
-
-    @{
-        List<string> teams = new List<string>();
-        foreach (Team team in Model.Teams) 
-        {
-            teams.Add(team.Name);
-        }
-
-        @if (teams.Count() >= 2)
-        {
-            <p> Het eerste team is: @teams[0]</p>
-            <p>Het tweede team is: @teams[1]</p>
-        }
-    }
-
-@Html.Partial("_GeneratedBracket")
-
-    
-    <form method="post" asp-action="SignUp" asp-route-id="@Model.Id">
-        <button type="submit" class="btn btn-primary">Team Aanmelden</button>
+@if (Model.IsGenerated == false)
+{    
+    <form method="post" asp-controller="Brackets" asp-action="GenerateBracket" asp-route-id="@Model.Id">
+        <button type="submit" class="btn btn-primary">Bracket Genereren</button>
     </form>
+}
 
+else
+{  
+    <div>@await Html.PartialAsync("_GeneratedBracket", Model)</div>
+}
+   
+@*    
     <dl class="row">
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Name)
@@ -44,7 +30,7 @@
             @Html.DisplayFor(model => model.Name)
         </dd>
     </dl>
-</div>
+*@
 <div>
     <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>

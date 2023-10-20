@@ -1,5 +1,6 @@
 ﻿using CTFTournamentPlanner.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
@@ -16,6 +17,7 @@ namespace CTFTournamentPlanner.Controllers
 
         public IActionResult Index()
         {
+            
             return View();
         }
 

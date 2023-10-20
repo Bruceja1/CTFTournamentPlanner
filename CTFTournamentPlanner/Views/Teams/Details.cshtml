@@ -13,6 +13,9 @@
     <button type="submit" class="btn btn-primary">Join Team</button>
 </form>
 
+<form method="post" asp-controller="Teams" asp-action="LeaveTeam" asp-route-id="@Model.Id">
+    <button type="submit" class="btn btn-primary">Leave Team</button>
+</form>
 
 <table class="table">
     <thead>
@@ -42,17 +45,9 @@
                 
             <td>
                 <ul>
-                @{
-                    int count = 0;
-                }
                 @foreach (var player in Model.Players)
-                {
-                    if (count < 4)
-                    {
-                        <li>@player.UserName </li>
-
-                    }
-                    count++;
+                {                   
+                    <li>@player.UserName </li>                                   
                 }
                 </ul>
             </td>

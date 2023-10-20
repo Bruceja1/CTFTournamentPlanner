@@ -20,6 +20,19 @@
                         Team teamA = teams[1];
                         Team teamB = teams[0];
 
+                        foreach (Team team in teams)
+                        {
+                            if (team.Id == matchup.SelectedTeamAId)
+                            {
+                                teamA = team;
+                            }
+
+                            if (team.Id == matchup.SelectedTeamBId)
+                            {
+                                teamB = team;
+                            }
+                        }
+
                         <div class="matchup-box">
                             <table class="table">
                                 <tr><td class="matchup-team-box">@teamA.Name</td><td class="matchup-team-box-score">@matchup.ScoreA</td></tr>

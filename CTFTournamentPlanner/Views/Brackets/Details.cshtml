@@ -5,12 +5,13 @@
 }
 
 <h1>@Model.Name</h1>
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-<p>Aantal deelnemende teams: @Model.Teams.Count()</p>
 <h4>Bracket</h4>
 
 @if (Model.IsGenerated == false)
 {
+    <p>Aantal deelnemende teams: @Model.Teams.Count()</p>
     <p>De bracket zal binnenkort door de administrator aangemaakt worden!</p>
     <table>
         <tr>

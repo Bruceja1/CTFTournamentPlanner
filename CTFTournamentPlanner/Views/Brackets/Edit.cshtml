@@ -9,6 +9,31 @@
 <h4>Bracket</h4>
 <hr />
 
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <table>
+                <tr>
+                    <td>
+                        <div class="form-group">
+                            <label asp-for="Name" class="control-label">Naam</label>
+                            <input asp-for="Name" class="form-control" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-group">
+                            <input type="submit" value="Opslaan" class="btn btn-primary" />
+                        </div>
+                    </td>
+                </tr>
+            </table>                     
+        </form>
+    </div>
+</div>
+
 <table class="table">
     <tr>
         @foreach (Round round in Model.Rounds)
@@ -28,6 +53,19 @@
                     {
                         Team teamA = teams[1];
                         Team teamB = teams[0];
+
+                        foreach (Team team in teams)
+                        {
+                            if (team.Id == matchup.SelectedTeamAId)
+                            {
+                                teamA = team;
+                            }
+
+                            if (team.Id == matchup.SelectedTeamBId)
+                            {
+                                teamB = team;
+                            }
+                        }
 
                         <table>
                             <tr>
@@ -124,16 +162,16 @@
 <table>
     <tr>
         <td class="table">
-            <a asp-action="Details" asp-route-id="@Model?.Id">Terug naar lijst</a>
+            <a asp-action="Details" asp-route-id="@Model?.Id">Terug naar bracket</a>
         </td>
         <td>
             <a asp-controller="Brackets" asp-action="ArchiveBracket" asp-route-id="@Model?.Id">
-                <button type="submit" class="btn btn-primary" style="margin-right: 50px; width: 200px;">Markeren als voltooid</button>
+                <button type="submit" class="btn btn-primary" style="margin-right: 50px; width: 200px;">Toernament markeren als voltooid</button>
             </a>
         </td>
         <td>
             <a asp-controller="Brackets" asp-action="Delete" asp-route-id="@Model?.Id">
-                <button type="submit" class="btn btn-primary">Verwijderen</button>
+                <button type="submit" class="btn btn-primary">Toernament Verwijderen</button>
             </a>
         </td>
     </tr>

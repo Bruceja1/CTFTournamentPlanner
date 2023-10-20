@@ -287,20 +287,19 @@ namespace CTFTournamentPlanner.Controllers
                 ModelState.AddModelError("", "Deze bracket is al gegenereerd.");
             }
 
-            if (bracket.IsActive == false)
+            if (teams.Count() < 8)
             {
-                ModelState.AddModelError("", "Deze bracket is niet meer actief.");
-                return View("Details", id);
+                ModelState.AddModelError("", "Er moeten minimaal acht teams aangemeld zijn voor het toernament.");
             }
 
-            if (teams.Count() < 4)
+            if (teams.Count() % 8 != 0)
             {
-                ModelState.AddModelError("", "Er moeten minimaal vier teams aangemeld zijn voor het toernament.");
+                ModelState.AddModelError("", "Het aantal teams moet deelbaar zijn door acht.");
             }
 
-            if (teams.Count() / 4 != 0)
+            if (!ModelState.IsValid)
             {
-                ModelState.AddModelError("", "Het aantal teams moet deelbaar zijn door vier.");
+                return View("Details", bracket);
             }
 
             // Volgorde teams verwisselen met de Fisher-Yates shuffle zodat teams willekeurig ingedeeld kunnen worden.

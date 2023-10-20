@@ -105,6 +105,13 @@ namespace CTFTournamentPlanner.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,ScoreA,ScoreB,RoundId,SelectedTeamAId,SelectedTeamBId")] Matchup matchup)
         {
+            // Bestaande matchup ophalen (Met de oude data). Anders verschijnen er een heleboel nare errors...
+            var existingMatchup = await _context.Matchups
+                .Include(m => m.Teams)
+                .Include(m => m.Round)
+                    .ThenInclude(r => r.Bracket)
+                .FirstOrDefaultAsync(m => m.Id == matchup.Id);
+
             if (id != matchup.Id)
             {
                 return NotFound();
@@ -116,14 +123,7 @@ namespace CTFTournamentPlanner.Controllers
             }
 
             if (ModelState.IsValid)
-            {
-                // Bestaande matchup ophalen (Met de oude data). Anders verschijnen er een heleboel nare errors...
-                var existingMatchup = await _context.Matchups
-                    .Include(m => m.Teams)
-                    .Include(m => m.Round)
-                        .ThenInclude(r => r.Bracket)
-                    .FirstOrDefaultAsync(m => m.Id == matchup.Id);
-
+            {              
                 try
                 {                                     
                     if (existingMatchup != null)
@@ -183,7 +183,7 @@ namespace CTFTournamentPlanner.Controllers
                 return RedirectToAction("Details", "Brackets", new { id = existingMatchup.Round.Bracket.Id });
             }
             ViewData["RoundId"] = new SelectList(_context.Rounds, "Id", "Id", matchup.RoundId);
-            return View(matchup);
+            return View("Edit", existingMatchup);
         }
 
         [Authorize(Roles = "Administrators")]

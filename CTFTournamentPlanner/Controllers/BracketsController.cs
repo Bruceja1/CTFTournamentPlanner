@@ -101,16 +101,18 @@ namespace CTFTournamentPlanner.Controllers
                 return NotFound();
             }
 
-            var bracket = await _context.Brackets
+            Bracket bracket = await _context.Brackets
                 .Include(b => b.Teams)
                 .Include(b => b.Rounds)
                     .ThenInclude(r => r.Matchups)
                         .ThenInclude(m => m.Teams)
                 .FirstOrDefaultAsync(b => b.Id == id);
+
             if (bracket == null)
             {
                 return NotFound();
             }
+
             return View(bracket);
         }
 
@@ -129,11 +131,31 @@ namespace CTFTournamentPlanner.Controllers
 
             if (ModelState.IsValid)
             {
+                /*
                 try
                 {
                     _context.Update(bracket);
                     await _context.SaveChangesAsync();
                 }
+                */
+
+                try
+                {
+                    var originalBracket = _context.Brackets.Find(bracket.Id);
+                    if (originalBracket == null)
+                    {
+                        return NotFound();
+                    }
+
+                    // Ophalen van de oorspronkelijke IsGenerated waarde.
+                    bracket.IsGenerated = originalBracket.IsGenerated;
+
+                    // Overige properties terugzetten zoals ze horen.
+                    _context.Entry(originalBracket).CurrentValues.SetValues(bracket);
+
+                    await _context.SaveChangesAsync();
+                }
+
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!BracketExists(bracket.Id))
@@ -145,7 +167,7 @@ namespace CTFTournamentPlanner.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Details", new { id = bracket.Id} );
             }
             return View(bracket);
         }
@@ -202,8 +224,9 @@ namespace CTFTournamentPlanner.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // Aangezien het niet praktisch is om elk team individueel aan te moeten melden om deel te nemen aan een bracket, is deze
-        // functionaliteit voor deze inleveropdracht eruit gehaald.
+        // Aangezien het niet praktisch is om elk gegenereerd team individueel aan te moeten melden om deel te nemen aan een bracket,
+        // is deze functionaliteit voor deze inleveropdracht weggehaald. Als deze applicatie in productie gezet zou worden kan deze
+        // functie gebruikt worden.
         /*
         [Authorize]
         public async Task<IActionResult> SignUp(int id)
@@ -244,8 +267,6 @@ namespace CTFTournamentPlanner.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> GenerateBracket(int id)
         {
-            // Scenario waarin het aantal teams oneven is verwerken...
-
             Bracket bracket = await _context.Brackets
                 .Include(b => b.Teams)
                 .Include(b => b.Rounds)
@@ -266,20 +287,19 @@ namespace CTFTournamentPlanner.Controllers
                 ModelState.AddModelError("", "Deze bracket is al gegenereerd.");
             }
 
-            if (bracket.IsActive == false)
+            if (teams.Count() < 8)
             {
-                ModelState.AddModelError("", "Deze bracket is niet meer actief.");
-                return View("Details", id);
+                ModelState.AddModelError("", "Er moeten minimaal acht teams aangemeld zijn voor het toernament.");
             }
 
-            if (teams.Count() < 4)
+            if (teams.Count() % 8 != 0)
             {
-                ModelState.AddModelError("", "Er moeten minimaal vier teams aangemeld zijn voor het toernament.");
+                ModelState.AddModelError("", "Het aantal teams moet deelbaar zijn door acht.");
             }
 
-            if (teams.Count() / 4 != 0)
+            if (!ModelState.IsValid)
             {
-                ModelState.AddModelError("", "Het aantal teams moet deelbaar zijn door vier.");
+                return View("Details", bracket);
             }
 
             // Volgorde teams verwisselen met de Fisher-Yates shuffle zodat teams willekeurig ingedeeld kunnen worden.
@@ -338,9 +358,13 @@ namespace CTFTournamentPlanner.Controllers
                     if (i == bracket.Teams.ToList().Count())
                     {
                         matchup.Teams.Add(teams[teams.Count() - 1]);
+                        matchup.SelectedTeamAId = teams[teams.Count() - 1].Id;
                         teams.RemoveAt(teams.Count() - 1);
+                      
                         matchup.Teams.Add(teams[teams.Count() - 1]);
+                        matchup.SelectedTeamBId = teams[teams.Count() - 1].Id;
                         teams.RemoveAt(teams.Count() - 1);
+                        
 
                     }
                     _context.Matchups.Add(matchup);
@@ -356,12 +380,23 @@ namespace CTFTournamentPlanner.Controllers
 
         }
 
+        // Dit is om de status van de bracket aan te passen. Deze verschijnt als 'Actief' of 'Voltooid' op het bracketsoverzicht scherm.
+        [Authorize (Roles = "Administrators")]
         public async Task<IActionResult> ArchiveBracket(int id)
         {
             Bracket bracket = await _context.Brackets
                 .FirstOrDefaultAsync(b => b.Id == id);
+
+            if (bracket.IsActive)
+            {
+                bracket.IsActive = false;
+            }
+
+            else
+            {
+                bracket.IsActive = true;
+            }
  
-            _context.Update(bracket.IsActive == false);
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));

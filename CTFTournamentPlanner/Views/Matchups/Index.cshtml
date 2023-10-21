@@ -18,6 +18,15 @@
             <th>
                 @Html.DisplayNameFor(model => model.ScoreB)
             </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Round)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SelectedTeamAId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SelectedTeamBId)
+            </th>
             <th></th>
         </tr>
     </thead>
@@ -29,6 +38,15 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.ScoreB)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Round.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SelectedTeamAId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SelectedTeamBId)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |

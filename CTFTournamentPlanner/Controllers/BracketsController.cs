@@ -387,12 +387,12 @@ namespace CTFTournamentPlanner.Controllers
             Bracket bracket = await _context.Brackets
                 .FirstOrDefaultAsync(b => b.Id == id);
 
-            if (bracket.IsActive)
+            if (bracket.IsActive == true)
             {
                 bracket.IsActive = false;
             }
 
-            else
+            else if (bracket.IsActive == false)
             {
                 bracket.IsActive = true;
             }

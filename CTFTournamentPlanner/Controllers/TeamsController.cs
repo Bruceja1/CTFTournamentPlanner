@@ -155,9 +155,7 @@ namespace CTFTournamentPlanner.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description")] Team team)
         {
-            Team existingTeam = await _context.Teams
-                .Include(t => t.Players)
-                .FirstOrDefaultAsync(t => t.Id == id);
+            Team existingTeam = await _context.Teams.FindAsync(id);
 
             if (id != team.Id)
             {
@@ -175,7 +173,10 @@ namespace CTFTournamentPlanner.Controllers
             {               
                 try
                 {
-                    _context.Update(team);
+                    existingTeam.Name = team.Name;
+                    existingTeam.Description = team.Description;
+                    
+                    _context.Update(existingTeam);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -233,7 +234,9 @@ namespace CTFTournamentPlanner.Controllers
                 return Problem("Entity set 'ApplicationDbContext.Teams'  is null.");
             }
 
-            Team team = await _context.Teams.FindAsync(id);
+            Team team = await _context.Teams
+                .Include(t => t.Players)
+                .FirstOrDefaultAsync(t => t.Id == id);
             if (currentUser.IsTeamLeader == false | currentUser.Team != team)
             {              
                 ModelState.AddModelError("", "Je mag alleen je eigen team verwijderen.");
@@ -248,6 +251,10 @@ namespace CTFTournamentPlanner.Controllers
 
             else
             {
+                foreach(Player player in team.Players)
+                {
+                    player.TeamId = null;
+                }
                 _context.Teams.Remove(team);
                 currentUser.IsTeamLeader = false;
                 await _context.SaveChangesAsync();

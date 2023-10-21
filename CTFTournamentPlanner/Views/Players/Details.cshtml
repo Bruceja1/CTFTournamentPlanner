@@ -10,6 +10,7 @@
 <table class="table" style="margin-top: 200px;">
     <thead>
         <tr>
+            <th>Email</th>
             <th>Team</th>
             @if (Model.Team != null)
             {
@@ -19,6 +20,9 @@
         </tr>
     </thead>
     <tr>
+        <td>
+            @Model.Email
+        </td>
         @if (Model.Team != null)
         {
             <td>

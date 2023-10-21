@@ -20,9 +20,11 @@ html {
 body {
   margin-bottom: 60px;
   font-family: minecraftia;
-  background-color: antiquewhite
-  
-  
+  background-image: url('/images/background1.png');
+  background-size: 100%; 1000px;
+  background-repeat: no-repeat;
+  background-position: top center;
+  background-color: antiquewhite;
 }
 
 @font-face {
@@ -70,3 +72,18 @@ body {
     max-width: 100px;
     width: 100px;
 }
+
+.flags {
+    background-image: url('/images/flags.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center center;
+    width: 800px;
+    height: 800px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    margin-left: 551px;
+}
+

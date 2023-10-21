@@ -3,6 +3,7 @@ using CTFTournamentPlanner.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Drawing.Text;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -25,6 +26,7 @@ namespace CTFTournamentPlannerAPI.Controllers
         public async Task<ActionResult<IEnumerable<Player>>> Get()
         {
             var players = await _context.Users.ToListAsync();
+
             return players;
         }
 
@@ -42,20 +44,95 @@ namespace CTFTournamentPlannerAPI.Controllers
 
         // POST api/<UsersController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<ActionResult<Player>> Post([FromBody] string email)
         {
+            if (emailValid(email))
+            {
+                Player newPlayer = new Player
+                {
+                    Email = email,
+                    UserName = email,
+                };
+
+                await userManager.CreateAsync(newPlayer, "Pa$$w0rd");
+                await _context.SaveChangesAsync();
+
+                return newPlayer;
+            }
+            else
+            {
+                ModelState.AddModelError("Email", "Ongeldig email formaat.");
+                return BadRequest(ModelState);
+            }                       
         }
 
-        // PUT api/<UsersController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        // Valideren of het ingevoerde emailadres van het juiste formaat is.
+        private bool emailValid(string email)
         {
+            try
+            {
+                var addr = new System.Net.Mail.MailAddress(email);
+                return addr.Address == email;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        // Emailadres wijzigen
+        // PUT api/<UsersController>/5
+        [HttpPut("{email}")]
+        public async Task<ActionResult<Player>> Put(string email, [FromBody] string newEmail)
+        {
+            Player player = await _context.Users.FirstOrDefaultAsync(p => p.Email == email);
+            if (player == null)
+            {
+                return NotFound();
+            }
+
+            if (emailValid(newEmail))
+            {
+                player.Email = newEmail;
+                player.UserName = newEmail;
+                player.NormalizedEmail = newEmail.ToUpper();
+                player.NormalizedUserName = newEmail.ToUpper();
+                _context.Update(player);
+                await _context.SaveChangesAsync();
+
+                return player;
+            }
+            else
+            {
+                ModelState.AddModelError("Email", "Ongeldig email formaat.");
+                return BadRequest(ModelState);
+            }            
         }
 
         // DELETE api/<UsersController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        [HttpDelete("{email}")]
+        public async Task<ActionResult<Player>> Delete(string email)
         {
+            Player player = await _context.Users.FirstOrDefaultAsync(p => p.Email == email);
+            if (player == null)
+            {
+                return NotFound();
+            }
+
+            _context.Remove(player);
+            await _context.SaveChangesAsync();
+
+            Player deletedPlayer = await _context.Users.FirstOrDefaultAsync(p => p.Email == email);
+            if (deletedPlayer == null)
+            {
+                return Ok();
+            }
+
+            else
+            {
+                return BadRequest();
+            }
+
         }
     }
 }

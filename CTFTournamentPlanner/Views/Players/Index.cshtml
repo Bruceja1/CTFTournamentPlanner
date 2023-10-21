@@ -12,7 +12,7 @@
             <td>@p.Id</td>
             <td>@p.UserName</td>
             <td>@p.Email</td>
-            <td>@(p.Team?.Name ?? "Geen team")</td>
+            <td>@(p.Team?.Name ?? "")</td>
             <td>
                 <a class="btn btn-sm btn-primary" asp-action="Edit" asp-route-id="@p.Id">
                     Wijzigen

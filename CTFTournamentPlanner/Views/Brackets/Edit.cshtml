@@ -24,18 +24,18 @@
                         </div>
                     </td>
                     <td>
-                        <div class="form-group" style="margin-right:500px;">
+                        <div class="form-group" style="margin-right:200px;">
                             <input type="submit" value="Opslaan" class="btn btn-primary" />
                         </div>
                     </td>
                     <td>
                         <a asp-controller="Brackets" asp-action="ArchiveBracket" asp-route-id="@Model?.Id">
-                            <button type="submit" class="btn btn-info" style="margin-right: 50px; width: 400px;">Toernament markeren als voltooid</button>
+                            <input value="Toernament markeren als voltooid" class="btn btn-info" style="margin-right: 20px; width: 400px;" />
                         </a>
                     </td>
                     <td>
                         <a asp-controller="Brackets" asp-action="Delete" asp-route-id="@Model?.Id">
-                            <button type="submit" class="btn btn-danger">Toernament Verwijderen</button>
+                            <input value="Toernament Verwijderen" class="btn btn-danger" />
                         </a>
                     </td>
                 </tr>

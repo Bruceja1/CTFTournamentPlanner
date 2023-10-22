@@ -19,7 +19,7 @@ namespace CTFTournamentPlanner.Controllers
             this.userManager = userManager;
         }
 
-        [Authorize(Roles = "Administrators")]
+        
         public async Task<IActionResult> Index()
         {
             var players = await _context.Users
@@ -35,9 +35,10 @@ namespace CTFTournamentPlanner.Controllers
                 return NotFound();
             }
 
-            Player player = _context.Users
+            Player player = await _context.Users
                 .Include(p => p.Team)
-                .FirstOrDefault(p => p.Id == id);
+                    .ThenInclude(t => t.Players)
+                .FirstOrDefaultAsync(p => p.Id == id);
 
             if (player == null)
             {
@@ -47,15 +48,10 @@ namespace CTFTournamentPlanner.Controllers
             return View(player);
         }
 
-        [Authorize]
+        [Authorize(Roles = "Administrators")]
         public async Task<IActionResult> Edit(string id)
         {
             Player player = await userManager.FindByIdAsync(id);
-            Player currentUser = await userManager.GetUserAsync(User);
-            if (currentUser.Id != player.Id)
-            {
-                ModelState.AddModelError("", "Je mag alleen je eigen gegevens wijzigen!"); 
-            }
 
             if (player != null)
                 return View(player);
@@ -65,36 +61,21 @@ namespace CTFTournamentPlanner.Controllers
 
         [Authorize(Roles = "Administrators")]
         [HttpPost]
-        public async Task<IActionResult> Edit(string id, string email, string username)
+        public async Task<IActionResult> Edit(string id, string email)
         {
             Player player = await userManager.FindByIdAsync(id);
             if (player != null)
             {
-                // if (!string.IsNullOrEmpty(email))                   
-                player.Email = email;
+                if (!string.IsNullOrEmpty(email))
+                {
+                    player.Email = email;
+                    player.UserName = email;
+                }
 
-                /* 
                 else
                     ModelState.AddModelError("", "Email cannot be empty");
-                */
-
-                // if (!string.IsNullOrEmpty(username))               
-                player.UserName = username;
-                
-                /*
-                else
-                    ModelState.AddModelError("", "Username cannot be empty");
-                */
-
-                // if (!string.IsNullOrEmpty(password))
-                // player.PasswordHash = passwordHasher.HashPassword(player, password);
-                
-                /*
-                else
-                    ModelState.AddModelError("", "Password cannot be empty");
-                */
-
-                if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(username))
+                             
+                if (!string.IsNullOrEmpty(email))
                 {
                     IdentityResult result = await userManager.UpdateAsync(player);
                     if (result.Succeeded)
@@ -147,16 +128,18 @@ namespace CTFTournamentPlanner.Controllers
 
                 // Als de gebruiker in een team zit, en hij het enig teamlid is of een teamleider is,
                 // wordt zijn team ook verwijderd.
-                Team? playerTeam = await _context.Teams.FindAsync(player.TeamId);
-                Console.WriteLine(playerTeam);
-
-                // Requirement om het teamleiderschap aan een ander teamlid te geven
-                // kan hier geïmplementeerd worden.
-                // List<Player> TeamMembers = userManager.Users.Where(p => p.TeamId == playerTeam.Id).ToList();
-                // ...
-                if (playerTeam != null && player.IsTeamLeader == true)
+                Team? team = await _context.Teams
+                    .Include(t => t.Players)
+                    .FirstOrDefaultAsync(t => t.Id == player.TeamId);
+                
+                if (team != null && player.IsTeamLeader == true)
                 {
-                    _context.Teams.Remove(playerTeam);
+                    foreach (Player p in team.Players)
+                    {
+                        p.TeamId = null;
+                    }
+
+                    _context.Teams.Remove(team);
                     await _context.SaveChangesAsync();
                 }
 

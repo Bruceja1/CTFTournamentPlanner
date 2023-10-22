@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CTFTournamentPlanner.Data;
 using CTFTournamentPlanner.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CTFTournamentPlanner.Controllers
 {
@@ -19,14 +20,15 @@ namespace CTFTournamentPlanner.Controllers
             _context = context;
         }
 
+        [Authorize (Roles = "Administrators")]
         // GET: Matchups
         public async Task<IActionResult> Index()
         {
-              return _context.Matchups != null ? 
-                          View(await _context.Matchups.ToListAsync()) :
-                          Problem("Entity set 'ApplicationDbContext.Matchups'  is null.");
+            var applicationDbContext = _context.Matchups.Include(m => m.Round);
+            return View(await applicationDbContext.ToListAsync());
         }
 
+        [Authorize(Roles = "Administrators")]
         // GET: Matchups/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -36,6 +38,7 @@ namespace CTFTournamentPlanner.Controllers
             }
 
             var matchup = await _context.Matchups
+                .Include(m => m.Round)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (matchup == null)
             {
@@ -45,18 +48,21 @@ namespace CTFTournamentPlanner.Controllers
             return View(matchup);
         }
 
+        [Authorize(Roles = "Administrators")]
         // GET: Matchups/Create
         public IActionResult Create()
         {
+            ViewData["RoundId"] = new SelectList(_context.Rounds, "Id", "Id");
             return View();
         }
 
         // POST: Matchups/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Administrators")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,ScoreA,ScoreB,RoundId")] Matchup matchup)
+        public async Task<IActionResult> Create([Bind("Id,ScoreA,ScoreB,RoundId,SelectedTeamAId,SelectedTeamBId")] Matchup matchup)
         {
             if (ModelState.IsValid)
             {
@@ -64,9 +70,11 @@ namespace CTFTournamentPlanner.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["RoundId"] = new SelectList(_context.Rounds, "Id", "Id", matchup.RoundId);
             return View(matchup);
         }
 
+        [Authorize(Roles = "Administrators")]
         // GET: Matchups/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -75,33 +83,93 @@ namespace CTFTournamentPlanner.Controllers
                 return NotFound();
             }
 
-            var matchup = await _context.Matchups.FindAsync(id);
+            var matchup = await _context.Matchups
+                .Include(m => m.Teams)
+                .Include(m => m.Round)
+                    .ThenInclude(r => r.Bracket)
+                        .ThenInclude(b => b.Teams)
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (matchup == null)
             {
                 return NotFound();
             }
+            ViewData["RoundId"] = new SelectList(_context.Rounds, "Id", "Id", matchup.RoundId);
             return View(matchup);
         }
 
         // POST: Matchups/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Administrators")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,ScoreA,ScoreB,RoundId")] Matchup matchup)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,ScoreA,ScoreB,RoundId,SelectedTeamAId,SelectedTeamBId")] Matchup matchup)
         {
+            // Bestaande matchup ophalen (Met de oude data). Anders verschijnen er een heleboel nare errors...
+            var existingMatchup = await _context.Matchups
+                .Include(m => m.Teams)
+                .Include(m => m.Round)
+                    .ThenInclude(r => r.Bracket)
+                        .ThenInclude(b => b.Teams)
+                .FirstOrDefaultAsync(m => m.Id == matchup.Id);
+
             if (id != matchup.Id)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            if (matchup.SelectedTeamAId == matchup.SelectedTeamBId && matchup.SelectedTeamAId != null && matchup.SelectedTeamBId != null)
             {
+                ModelState.AddModelError("", "Een team mag niet twee keer voorkomen in een matchup.");
+            }
+
+            if (ModelState.IsValid)
+            {              
                 try
-                {
-                    _context.Update(matchup);
-                    await _context.SaveChangesAsync();
+                {                                     
+                    if (existingMatchup != null)
+                    {
+
+                        if (matchup.SelectedTeamAId != null && matchup.SelectedTeamBId != null)
+                        {
+                            existingMatchup.Teams.Clear();
+                            var teamA = await _context.Teams.FindAsync(matchup.SelectedTeamAId);                          
+                            existingMatchup.Teams.Add(teamA);
+
+                            var teamB = await _context.Teams.FindAsync(matchup.SelectedTeamBId);
+                            existingMatchup.Teams.Add(teamB);
+                        }
+
+                        else if (matchup.SelectedTeamAId == null && matchup.SelectedTeamBId != null)
+                        {
+                            existingMatchup.Teams.Clear();
+                            var teamB = await _context.Teams.FindAsync(matchup.SelectedTeamBId);
+                            existingMatchup.Teams.Add(teamB);
+                        }
+
+                        else if (matchup.SelectedTeamAId != null && matchup.SelectedTeamBId == null)
+                        {
+                            existingMatchup.Teams.Clear();
+                            var teamA = await _context.Teams.FindAsync(matchup.SelectedTeamAId);                                                     
+                            existingMatchup.Teams.Add(teamA);
+                        }
+
+                        else if (matchup.SelectedTeamAId == null && matchup.SelectedTeamBId == null)
+                        {
+                            existingMatchup.Teams.Clear();
+                        }
+                                            
+                        existingMatchup.ScoreA = matchup.ScoreA;
+                        existingMatchup.ScoreB = matchup.ScoreB;
+
+                        existingMatchup.SelectedTeamAId = matchup.SelectedTeamAId;
+                        existingMatchup.SelectedTeamBId = matchup.SelectedTeamBId;
+
+                        // _context.Update(existingMatchup);
+                        await _context.SaveChangesAsync();
+                    }                                   
                 }
+
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!MatchupExists(matchup.Id))
@@ -113,11 +181,13 @@ namespace CTFTournamentPlanner.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Details", "Brackets", new { id = existingMatchup.Round.Bracket.Id });
             }
-            return View(matchup);
+            ViewData["RoundId"] = new SelectList(_context.Rounds, "Id", "Id", matchup.RoundId);
+            return View("Edit", existingMatchup);
         }
 
+        [Authorize(Roles = "Administrators")]
         // GET: Matchups/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
@@ -127,6 +197,7 @@ namespace CTFTournamentPlanner.Controllers
             }
 
             var matchup = await _context.Matchups
+                .Include(m => m.Round)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (matchup == null)
             {
@@ -137,6 +208,7 @@ namespace CTFTournamentPlanner.Controllers
         }
 
         // POST: Matchups/Delete/5
+        [Authorize(Roles = "Administrators")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

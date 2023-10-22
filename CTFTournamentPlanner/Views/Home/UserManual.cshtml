@@ -1,9 +1,38 @@
 ﻿@{
     ViewData["Title"] = "Gebruikershandleiding";
 }
+
 <h1>@ViewData["Title"]</h1>
 
-<p>
-    Deze web applicatie dient voor het creëren van een toernament bracket en het creëren en beheren van teams. Gebruikers kunnen een team aanmaken
-    of bij iemand anders in het team gaan. 
+<h3>
+   Wat is 'Capture The Flag?'
+</h3>
+<p>'Capture The Flag', afgekort 'CTF', is een populair spel vaak gezien in online videospellen. Het thema van deze webapplicatie
+    is gebaseerd op Minecraft Classic (2009).
 </p>
+
+<p>
+    De opzet van het spel is vrij simpel. Er zijn twee teams (meestal rood en blauw). Elk team heeft een vlag en een teambasis. 
+    Om punten te scoren moet de vlag van de tegenstander gepikt worden en teruggebracht worden naar de eigen teambasis.
+</p>
+
+<h3>Het doel van deze applicatie</h3>
+<p>Deze applicatie dient voor het creëren & beheren van teams en brackets. Gebruikers maken een account aan en kiezen
+    vervolgens of zij zelf een team maken of bij een ander team meedoen. 
+</p>
+<p>
+    Om te beginnen klik je op 'Register' rechtsboven op het scherm. Maak een account aan en vervolgens klik je op 'Teams'.
+    Bekijk de lijst van teams. Join eventueel een bestaand team of maak een nieuw team aan door op 'Nieuw team' te klikken.
+</p>
+<p>
+    Klik op 'Brackets' om de lijst van toernamenten te bekijken. De status 'Actief' betekent dat dit toernament nog in gang is.   
+</p>
+<p>
+    Klik op 'Spelers' om de lijst van geregistreerde gebruikers te zien. Spelers hebben ook een profiel dat bekeken kan worden.
+</p>
+<p>
+    De administrator kan brackets aanmaken en beheren (tussenstanden updaten, status aanpassen, bracket verwijderen, etc).
+    De administrator kan ook gebruikers beheren. (Emailadres aanpassen & gebruikers verwijderen).
+</p>
+
+<a asp-area="" asp-controller="Home" asp-action="Index">Terug naar home pagina</a>

@@ -1,8 +1,35 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
-
-<div class="text-center">
-    <h1 class="display-4">CTF Tournament Planner</h1>
-    <p>Vorm een team en meld je aan voor een toernament!</p>
+<div class ="text-center" style="-webkit-text-stroke: 1px #000;">
+    <div>
+        <div style="margin-top: 300px; color: yellow;">
+            <div class="flags"></div>
+            <h1 class="display-4">Capture The Flag</h1>       
+        </div>
+    </div>
+    <h2 style="color: white">Tournament Planner</h2>
 </div>
+
+<div style="margin-left: 520px; margin-top: 120px;">
+    <table>
+        <tr>
+            <th>
+                <form asp-controller="Teams" asp-action="Index">
+                    <button type="submit" class="btn btn-dark" style="width: 116px;">Teams</button>
+                </form>
+            </th>
+            <th>
+                <form asp-controller="Brackets" asp-action="Index">
+                    <button type="submit" class="btn btn-dark">Brackets</button>
+                </form>
+            </th>
+        </tr>
+    </table>             
+</div>
+<div style="margin-left: 517px; margin-top: 5px;">
+    <form asp-controller="Home" asp-action="UserManual">
+        <button type="submit" class="btn btn-info">Gebruikershandleiding</button>
+    </form>
+</div>
+

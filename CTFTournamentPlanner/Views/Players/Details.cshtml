@@ -5,3 +5,54 @@
 }
 
 <h1>Profiel van @Html.DisplayFor(model => model.UserName)</h1>
+<a asp-action="Index">Terug naar gebruikersoverzicht</a>
+
+<table class="table" style="margin-top: 200px;">
+    <thead>
+        <tr>
+            <th>Email</th>
+            <th>Team</th>
+            @if (Model.Team != null)
+            {
+                <th>Aantal teamleden</th>
+            }
+            <th>Teamleider</th>
+        </tr>
+    </thead>
+    <tr>
+        <td>
+            @Model.Email
+        </td>
+        @if (Model.Team != null)
+        {
+            <td>
+                <table>
+                    <tr>
+                        <td>
+                            @Model.Team.Name
+                        </td>
+                        <td>
+                            <form method="get" asp-controller="Teams" asp-action="Details" asp-route-id="@Model.Team.Id" style="margin-left:25px;">
+                                <button type="submit" class="btn btn-info">Teamprofiel</button>
+                            </form>
+                        </td>
+                    </tr>
+                </table>               
+            </td>
+            <td>@Model.Team.Players.Count()</td>
+            if (Model.IsTeamLeader == true)
+            {
+                <td>Ja</td>
+            }
+            else
+            {
+                <td>Nee</td>
+            }
+        }
+        else
+        {
+            <td>Geen team.</td>    
+            <td>Nee</td>
+        }       
+    </tr>
+</table>

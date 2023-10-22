@@ -27,6 +27,16 @@
                 <select asp-for="RoundId" class ="form-control" asp-items="ViewBag.RoundId"></select>
             </div>
             <div class="form-group">
+                <label asp-for="SelectedTeamAId" class="control-label"></label>
+                <input asp-for="SelectedTeamAId" class="form-control" />
+                <span asp-validation-for="SelectedTeamAId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SelectedTeamBId" class="control-label"></label>
+                <input asp-for="SelectedTeamBId" class="form-control" />
+                <span asp-validation-for="SelectedTeamBId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
         </form>

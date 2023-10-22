@@ -128,10 +128,17 @@ namespace CTFTournamentPlanner.Controllers
 
                 // Als de gebruiker in een team zit, en hij het enig teamlid is of een teamleider is,
                 // wordt zijn team ook verwijderd.
-                Team? team = await _context.Teams.FindAsync(player.TeamId);
+                Team? team = await _context.Teams
+                    .Include(t => t.Players)
+                    .FirstOrDefaultAsync(t => t.Id == player.TeamId);
                 
                 if (team != null && player.IsTeamLeader == true)
                 {
+                    foreach (Player p in team.Players)
+                    {
+                        p.TeamId = null;
+                    }
+
                     _context.Teams.Remove(team);
                     await _context.SaveChangesAsync();
                 }

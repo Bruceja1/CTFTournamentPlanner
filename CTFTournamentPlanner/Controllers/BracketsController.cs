@@ -345,6 +345,8 @@ namespace CTFTournamentPlanner.Controllers
                 
 
                 // 'j' representeert het aantal matchups in de ronde, dus het aantal teams gedeeld door twee.
+
+                // Voor eventuele toekomstige uitbreiding:
                 // Stel dat het aantal teams in een ronde oneven is; het alleenstaande team wordt dan doorgeschoven naar de volgende
                 // ronde. Dus aantal matchups naar beneden afronden.
                 // for (double j = Math.Floor((double)i / 2); j > 0; j--)
@@ -363,9 +365,7 @@ namespace CTFTournamentPlanner.Controllers
                       
                         matchup.Teams.Add(teams[teams.Count() - 1]);
                         matchup.SelectedTeamBId = teams[teams.Count() - 1].Id;
-                        teams.RemoveAt(teams.Count() - 1);
-                        
-
+                        teams.RemoveAt(teams.Count() - 1);                       
                     }
                     _context.Matchups.Add(matchup);
                     await _context.SaveChangesAsync();
@@ -377,7 +377,6 @@ namespace CTFTournamentPlanner.Controllers
             bracket.IsGenerated = true;
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Details), bracket);
-
         }
 
         // Dit is om de status van de bracket aan te passen. Deze verschijnt als 'Actief' of 'Voltooid' op het bracketsoverzicht scherm.
